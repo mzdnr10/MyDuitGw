@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.myduitgw"
-        minSdk = 33
+        minSdk = 30
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -60,4 +60,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.navigation.compose)
     implementation(libs.androidx.compose.material.icons.extended)
+    implementation("androidx.credentials:credentials:1.6.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.6.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 }
