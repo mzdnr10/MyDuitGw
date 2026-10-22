@@ -1,4 +1,4 @@
-package com.example.myduitgw.model
+package com.example.myduitgw.data.model
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Bolt

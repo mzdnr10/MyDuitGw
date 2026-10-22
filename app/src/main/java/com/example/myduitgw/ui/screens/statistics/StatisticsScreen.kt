@@ -22,9 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myduitgw.data.FinanceStore
-import com.example.myduitgw.data.MockData
-import com.example.myduitgw.model.TransactionType
+import com.example.myduitgw.data.model.TransactionType
+import com.example.myduitgw.data.repository.FinanceStore
+import com.example.myduitgw.data.repository.MockData
 import com.example.myduitgw.ui.components.AppFilterChip
 import com.example.myduitgw.ui.components.CategoryBars
 import com.example.myduitgw.ui.components.ColoredHeader

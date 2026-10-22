@@ -37,8 +37,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myduitgw.data.FinanceStore
-import com.example.myduitgw.data.MockData
+import com.example.myduitgw.data.repository.FinanceStore
+import com.example.myduitgw.data.repository.MockData
 import com.example.myduitgw.ui.components.ColoredHeader
 import com.example.myduitgw.ui.components.OverlappingHeaderScreen
 import com.example.myduitgw.ui.components.ProfileAvatar

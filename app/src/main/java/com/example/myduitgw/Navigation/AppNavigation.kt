@@ -1,5 +1,12 @@
 package com.example.myduitgw.navigation
 
+import android.app.Activity
+import android.content.ContextWrapper
+import android.widget.Toast
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,59 +29,62 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
-import androidx.compose.foundation.clickable
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.myduitgw.data.FinanceStore
+import com.example.myduitgw.auth.GoogleAuthManager
+import com.example.myduitgw.data.repository.FinanceStore
+import com.example.myduitgw.ui.auth.WelcomeScreen
 import com.example.myduitgw.ui.material.Theme
-import com.example.myduitgw.ui.screens.addtransaction.AddTransactionScreen
 import com.example.myduitgw.ui.screens.home.HomeScreen
 import com.example.myduitgw.ui.screens.profile.ProfileScreen
 import com.example.myduitgw.ui.screens.savings.AddSavingsScreen
 import com.example.myduitgw.ui.screens.savings.SavingsScreen
-import com.example.myduitgw.ui.screens.statistics.StatisticsScreen
-import com.example.myduitgw.ui.screens.transactions.TransactionsScreen
-
 import com.example.myduitgw.ui.screens.splash.SplashScreen
-import com.example.myduitgw.ui.screens.welcome.WelcomeScreen
-import com.example.myduitgw.AuthApi
-
-//animation navigation
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.core.tween
-
-import android.app.Activity
-import android.content.ContextWrapper
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.rememberCoroutineScope
+import com.example.myduitgw.ui.screens.statistics.StatisticsScreen
+import com.example.myduitgw.ui.transaction.AddTransactionScreen
+import com.example.myduitgw.ui.transaction.TransactionsScreen
+import com.example.myduitgw.viewmodel.GoogleAuthViewModel
 import kotlinx.coroutines.launch
-import com.example.myduitgw.auth.GoogleAuthManager
-import android.widget.Toast
-
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
     val store = remember { FinanceStore() }
+    val authViewModel: GoogleAuthViewModel = viewModel()
+    val authUiState by authViewModel.uiState.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val showBottomBar = currentRoute in Routes.bottomBarRoutes
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(authUiState.message) {
+        val message = authUiState.message ?: return@LaunchedEffect
+        Toast.makeText(
+            context,
+            message,
+            if (authUiState.isError) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
+        ).show()
+        authViewModel.clearMessage()
+    }
 
     val activity = remember(context) {
         var current = context
@@ -113,16 +123,11 @@ fun AppNavigation() {
             navController = navController,
             startDestination = Routes.SPLASH,
             modifier = Modifier.padding(innerPadding),
-
             enterTransition = {
-                fadeIn(
-                    animationSpec = tween(350)
-                )
+                fadeIn(animationSpec = tween(350))
             },
             exitTransition = {
-                fadeOut(
-                    animationSpec = tween(350)
-                )
+                fadeOut(animationSpec = tween(350))
             }
         ) {
             composable(Routes.SPLASH) {
@@ -139,6 +144,7 @@ fun AppNavigation() {
 
             composable(Routes.WELCOME) {
                 WelcomeScreen(
+                    isLoading = authUiState.isLoading,
                     onGoogleSignIn = {
                         scope.launch {
                             try {
@@ -148,26 +154,16 @@ fun AppNavigation() {
                                     )
 
                                 val idToken = manager.signIn()
-
-                                val result = AuthApi.loginWithGoogle(idToken)
-
-                                android.util.Log.d(
+                                authViewModel.loginWithGoogle(idToken)
+                            } catch (exception: Exception) {
+                                android.util.Log.e(
                                     "GoogleAuth",
-                                    "Backend login berhasil untuk ${result.email}"
+                                    "Sign-in failed",
+                                    exception
                                 )
-
                                 Toast.makeText(
                                     context,
-                                    "Login backend berhasil!",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-
-                            } catch (e: Exception) {
-                                android.util.Log.e("GoogleAuth", "Sign-in failed", e)
-
-                                Toast.makeText(
-                                    context,
-                                    "${e.javaClass.name}: ${e.message}",
+                                    "${exception.javaClass.name}: ${exception.message}",
                                     Toast.LENGTH_LONG
                                 ).show()
                             }
@@ -175,7 +171,7 @@ fun AppNavigation() {
                     }
                 )
             }
-            // Composable Home dan halaman lainnya tetap di bawah sini.
+
             composable(Routes.HOME) {
                 HomeScreen(
                     store = store,

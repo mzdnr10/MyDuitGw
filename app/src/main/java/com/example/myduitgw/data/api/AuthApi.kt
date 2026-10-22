@@ -1,22 +1,16 @@
 
-package com.example.myduitgw
+package com.example.myduitgw.data.api
 
+import com.example.myduitgw.data.model.AuthResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
-data class AuthResult(
-    val token: String,
-    val userId: Int,
-    val name: String,
-    val email: String
-)
-
 object AuthApi {
     private const val ENDPOINT =
-        "http://10.19.24.90:8000/api/auth/google"
+        "http://10.19.24.18:8000/api/auth/google"
 
     suspend fun loginWithGoogle(idToken: String): AuthResult =
         withContext(Dispatchers.IO) {
@@ -62,7 +56,7 @@ object AuthApi {
                     throw IllegalStateException(
                         json.optString(
                             "responseMessage",
-                            "Login gagal (HTTP $status)"
+                            "Login gagal"
                         )
                     )
                 }

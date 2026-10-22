@@ -1,6 +1,6 @@
 package com.example.myduitgw.util
 
-import com.example.myduitgw.model.TransactionType
+import com.example.myduitgw.data.model.TransactionType
 import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myduitgw.model.SavingsGoal
+import com.example.myduitgw.data.model.SavingsGoal
 import com.example.myduitgw.ui.material.Grey50
 import com.example.myduitgw.ui.material.Radius
 import com.example.myduitgw.ui.material.Spacing

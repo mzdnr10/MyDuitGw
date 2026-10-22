@@ -1,12 +1,12 @@
-package com.example.myduitgw.data
+package com.example.myduitgw.data.repository
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.example.myduitgw.model.Category
-import com.example.myduitgw.model.FinancialSummary
-import com.example.myduitgw.model.SavingsGoal
-import com.example.myduitgw.model.Transaction
-import com.example.myduitgw.model.TransactionType
+import com.example.myduitgw.data.model.Category
+import com.example.myduitgw.data.model.FinancialSummary
+import com.example.myduitgw.data.model.SavingsGoal
+import com.example.myduitgw.data.model.Transaction
+import com.example.myduitgw.data.model.TransactionType
 import java.time.LocalDate
 import java.util.UUID
 

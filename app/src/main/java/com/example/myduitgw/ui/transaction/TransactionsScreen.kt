@@ -1,4 +1,4 @@
-package com.example.myduitgw.ui.screens.transactions
+package com.example.myduitgw.ui.transaction
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -19,8 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myduitgw.data.FinanceStore
-import com.example.myduitgw.model.TransactionType
+import com.example.myduitgw.data.model.TransactionType
+import com.example.myduitgw.data.repository.FinanceStore
 import com.example.myduitgw.ui.components.AppFilterChip
 import com.example.myduitgw.ui.components.ColoredHeader
 import com.example.myduitgw.ui.components.OverlappingHeaderScreen

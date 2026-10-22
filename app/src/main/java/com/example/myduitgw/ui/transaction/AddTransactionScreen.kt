@@ -1,4 +1,4 @@
-package com.example.myduitgw.ui.screens.addtransaction
+package com.example.myduitgw.ui.transaction
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -42,9 +42,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.myduitgw.data.FinanceStore
-import com.example.myduitgw.model.Category
-import com.example.myduitgw.model.TransactionType
+import com.example.myduitgw.data.model.Category
+import com.example.myduitgw.data.model.TransactionType
+import com.example.myduitgw.data.repository.FinanceStore
 import com.example.myduitgw.ui.components.AppFilterChip
 import com.example.myduitgw.ui.material.Grey50
 import com.example.myduitgw.ui.material.Radius

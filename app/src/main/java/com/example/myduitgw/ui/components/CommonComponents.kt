@@ -32,8 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myduitgw.model.Transaction
-import com.example.myduitgw.model.TransactionType
+import com.example.myduitgw.data.model.Transaction
+import com.example.myduitgw.data.model.TransactionType
 import com.example.myduitgw.ui.material.FinanceColors
 import com.example.myduitgw.ui.material.Grey50
 import com.example.myduitgw.ui.material.Radius

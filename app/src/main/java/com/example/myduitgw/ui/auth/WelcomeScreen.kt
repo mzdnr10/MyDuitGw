@@ -1,5 +1,5 @@
 
-package com.example.myduitgw.ui.screens.welcome
+package com.example.myduitgw.ui.auth
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -35,6 +35,7 @@ import com.example.myduitgw.ui.material.white
 
 @Composable
 fun WelcomeScreen(
+    isLoading: Boolean,
     onGoogleSignIn: () -> Unit
 ) {
     Surface(
@@ -90,6 +91,7 @@ fun WelcomeScreen(
             // Tombol Google
             Button(
                 onClick = onGoogleSignIn,
+                enabled = !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
