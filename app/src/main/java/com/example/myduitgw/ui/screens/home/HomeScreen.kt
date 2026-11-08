@@ -1,5 +1,6 @@
 package com.example.myduitgw.ui.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -54,12 +55,35 @@ import java.time.LocalDate
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.example.myduitgw.viewmodel.DashboardViewModel
 
 @Composable
 fun HomeScreen(
+    viewModel: DashboardViewModel,
     store: FinanceStore,
-    onNavigate: (String) -> Unit
+    onNavigate: (String) -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
+
+    LaunchedEffect(Unit) {
+        viewModel.getUserName()
+        viewModel.getDashboard()
+    }
+
+    val dashboardData = uiState.dashboard?.optJSONObject("data")
+    Log.d("data", "$dashboardData")
+    val userName = uiState.userName
+    val userData = dashboardData?.optJSONObject("user_data")
+    val balance = dashboardData?.optLong("balance") ?: 0L
+    val income = dashboardData?.optLong("income") ?: 0L
+    val expense = dashboardData?.optLong("expense") ?: 0L
+    val weekly_growth_percent = dashboardData?.optLong("weekly_growth_percent") ?: 0L
+    val recent_activity = dashboardData?.optLong("weekly_growth_percent") ?: "Tidak ada transaksi"
+
     val summary = store.summary()
     val recent = store.transactions.take(3)
     val snackbarHostState = remember { SnackbarHostState() }
@@ -99,7 +123,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
-                            text = "Hi, ${MockData.userName}!",
+                            text = "Hi, $userName",
                             color = Color.White,
                             fontSize = 17.sp,
                             fontWeight = FontWeight.SemiBold
@@ -136,6 +160,7 @@ fun HomeScreen(
                 }
             }
 
+
             Spacer(modifier = Modifier.height(Spacing.Large))
 
             Surface(
@@ -156,15 +181,19 @@ fun HomeScreen(
                         Text(text = "Total Saldo", color = Color.Gray, fontSize = 12.sp)
                         Spacer(modifier = Modifier.height(3.dp))
                         Text(
-                            text = summary.totalBalance.toRupiah(),
+                            text = balance.toRupiah(),
                             color = Color.Black,
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(3.dp))
                         Text(
-                            text = "+ ${summary.weeklyGrowthPercent}% minggu ini",
-                            color = FinanceColors.Income,
+                            text = "$weekly_growth_percent% minggu ini",
+                            color = if (weekly_growth_percent > 0) {
+                                FinanceColors.Income
+                            } else {
+                                FinanceColors.Expense
+                            },
                             fontSize = 11.sp
                         )
                     }

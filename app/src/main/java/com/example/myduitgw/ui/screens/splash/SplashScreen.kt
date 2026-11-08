@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.offset
 
 @Composable
 fun SplashScreen(
+    playLogoAnimation: Boolean,
     onFinished: () -> Unit
 ) {
     var visible by remember { mutableStateOf(false) }
@@ -47,7 +48,7 @@ fun SplashScreen(
         animationSpec = tween(durationMillis = 650),
         label = "logoScale"
     )
-
+//
     val alpha by animateFloatAsState(
         targetValue = if (visible) 1f else 0f,
         animationSpec = tween(durationMillis = 650),
@@ -67,16 +68,12 @@ fun SplashScreen(
 
     LaunchedEffect(Unit) {
         visible = true
-
         // Logo diam di tengah terlebih dahulu
         delay(1700)
-
         // Mulai bergerak naik
         movingUp = true
-
         // Tunggu animasi selesai sebelum pindah screen
         delay(100)
-
         onFinished()
     }
 
@@ -95,8 +92,8 @@ fun SplashScreen(
                 contentDescription = "Logo MyDuitGw",
                 modifier = Modifier
                     .size(200.dp)
-                    .scale(scale)
-                    .offset(y = offsetY),
+                    .scale(scale),
+//                    .offset(y = offsetY),
                 alpha = alpha
             )
 
@@ -107,7 +104,8 @@ fun SplashScreen(
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = Theme,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+//                modifier = Modifier.offset(y = offsetY)
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -116,7 +114,8 @@ fun SplashScreen(
                 text = "Manage your money, your way.",
                 fontSize = 15.sp,
                 color = Grey600,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+//                modifier = Modifier.offset(y = offsetY)
             )
         }
     }

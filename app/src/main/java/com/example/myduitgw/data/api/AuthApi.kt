@@ -9,13 +9,12 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object AuthApi {
-    private const val ENDPOINT =
-        "http://10.19.24.18:8000/api/auth/google"
+    private const val BASE_URL = "https://myduitgue-backend.ethiodeploy.app"
 
     suspend fun loginWithGoogle(idToken: String): AuthResult =
         withContext(Dispatchers.IO) {
             val connection =
-                URL(ENDPOINT).openConnection() as HttpURLConnection
+                URL("$BASE_URL/api/auth/google").openConnection() as HttpURLConnection
 
             try {
                 connection.requestMethod = "POST"
@@ -46,7 +45,7 @@ object AuthApi {
 
                 val responseText = stream?.bufferedReader()?.use {
                     it.readText()
-                } ?: error("Response dari server kosong.")
+                } ?: error("Request timeout.")
 
                 val json = JSONObject(responseText)
 
@@ -70,6 +69,27 @@ object AuthApi {
                     name = user.getString("name"),
                     email = user.getString("email")
                 )
+            } finally {
+                connection.disconnect()
+            }
+        }
+
+    suspend fun checkSession(token: String): Boolean =
+        withContext(Dispatchers.IO) {
+
+            val connection = URL("$BASE_URL/api/me")
+                .openConnection() as HttpURLConnection
+
+            try {
+                connection.requestMethod = "POST"
+                connection.connectTimeout = 15000
+                connection.readTimeout = 15000
+
+                connection.setRequestProperty("Accept", "application/json")
+                connection.setRequestProperty("Authorization", "Bearer $token")
+
+                connection.responseCode == 200
+
             } finally {
                 connection.disconnect()
             }

@@ -8,27 +8,88 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+import android.content.Context
+import android.util.Log
+import androidx.lifecycle.viewModelScope
+import com.example.myduitgw.data.repository.SessionManager
+
 data class GoogleAuthUiState(
     val isLoading: Boolean = false,
     val message: String? = null,
     val isError: Boolean = false,
-    val isAuthenticated: Boolean = false
+    val isAuthenticated: Boolean = false,
+    val isCheckingSession: Boolean = true
 )
 
 class GoogleAuthViewModel(
+    context: Context,
     private val authRepository: AuthRepository = AuthRepository()
 ) : ViewModel() {
+    private val sessionManager = SessionManager(context.applicationContext)
     private val _uiState = MutableStateFlow(GoogleAuthUiState())
     val uiState = _uiState.asStateFlow()
+
+
+    fun checkSession() {
+        viewModelScope.launch {
+            try {
+                val token = sessionManager.getToken()
+
+
+                if (token == null) {
+                    sessionManager.clearSession()
+
+                    _uiState.value = _uiState.value.copy(
+                        isAuthenticated = false,
+                        isCheckingSession = false
+                    )
+                    return@launch
+                }
+
+                val isValid = authRepository.checkSession(token)
+
+
+
+                if (!isValid) {
+                    sessionManager.clearSession()
+                }
+
+                _uiState.value = _uiState.value.copy(
+                    isAuthenticated = isValid,
+                    isCheckingSession = false
+                )
+
+            } catch (exception: CancellationException) {
+                throw exception
+
+            } catch (exception: Exception) {
+                sessionManager.clearSession()
+
+                _uiState.value = _uiState.value.copy(
+                    isAuthenticated = false,
+                    isCheckingSession = false
+                )
+            }
+        }
+    }
 
     fun loginWithGoogle(idToken: String) {
         viewModelScope.launch {
             _uiState.value = GoogleAuthUiState(isLoading = true)
             try {
-                authRepository.loginWithGoogle(idToken)
-                _uiState.value = GoogleAuthUiState(
-                    message = "Login backend berhasil!"
+                val result = authRepository.loginWithGoogle(idToken)
+                sessionManager.saveSession(
+                    token = result.token,
+                    userId = result.userId,
+                    name = result.name,
+                    email = result.email
                 )
+
+                _uiState.value = GoogleAuthUiState(
+                    message = "Login berhasil!",
+                    isAuthenticated = true
+                )
+                
             } catch (exception: CancellationException) {
                 throw exception
             } catch (exception: Exception) {

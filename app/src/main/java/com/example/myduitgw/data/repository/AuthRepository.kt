@@ -8,4 +8,8 @@ class AuthRepository(
 ) {
     suspend fun loginWithGoogle(idToken: String): AuthResult =
         authApi.loginWithGoogle(idToken)
+
+    suspend fun checkSession(token: String): Boolean {
+        return authApi.checkSession(token)
+    }
 }
