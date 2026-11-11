@@ -2,7 +2,10 @@ package com.example.myduitgw.ui.material
 
 import androidx.compose.ui.graphics.Color
 
-val Theme = Color(0xFF4692EE)
+val Theme = Color(0xE64692EE)
+val Theme1 = Color(0xFF5D96EE)
+val Theme2 = Color(0xFF75A7EE)
+val Theme3 = Color(0xFFA0CAFF)
 /* Red */
 val Red = Color( 0xfff44336)
 val Red50 = Color( 0xffffebee)

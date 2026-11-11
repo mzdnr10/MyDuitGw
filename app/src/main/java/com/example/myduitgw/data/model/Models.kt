@@ -13,6 +13,15 @@ import androidx.compose.material.icons.rounded.Work
 import androidx.compose.ui.graphics.vector.ImageVector
 import java.time.LocalDate
 
+data class Transaction(
+    val id: String,
+    val title: String,
+    val amount: Long,
+    val type: TransactionType,
+    val category: Category? = null,
+    val date: LocalDate,
+    val description: String = ""
+)
 enum class TransactionType {
     INCOME,
     EXPENSE
@@ -48,15 +57,7 @@ enum class Category(
         }
 }
 
-data class Transaction(
-    val id: String,
-    val title: String,
-    val amount: Long,
-    val type: TransactionType,
-    val category: Category,
-    val date: LocalDate,
-    val description: String = ""
-)
+
 
 data class SavingsGoal(
     val id: String,

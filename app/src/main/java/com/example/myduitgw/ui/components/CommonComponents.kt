@@ -40,8 +40,11 @@ import com.example.myduitgw.ui.material.Radius
 import com.example.myduitgw.ui.material.Spacing
 import com.example.myduitgw.ui.material.Theme
 import com.example.myduitgw.ui.material.white
+import com.example.myduitgw.ui.material.black
 import com.example.myduitgw.util.toDisplayDate
 import com.example.myduitgw.util.toSignedRupiah
+import com.example.myduitgw.data.model.Category
+import com.example.myduitgw.ui.material.Grey800
 
 @Composable
 fun ProfileAvatar(
@@ -52,7 +55,7 @@ fun ProfileAvatar(
         modifier = modifier
             .size(size)
             .clip(CircleShape)
-            .background(white.copy(alpha = 0.22f)),
+            .background(black.copy(alpha = 0.22f)),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -175,6 +178,13 @@ fun TransactionItem(
     transaction: Transaction,
     showDate: Boolean = true
 ) {
+    val category = transaction.category ?: if (
+        transaction.type == TransactionType.INCOME
+    ) {
+        Category.OTHER_INCOME
+    } else {
+        Category.OTHER_EXPENSE
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -188,8 +198,8 @@ fun TransactionItem(
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
-                    imageVector = transaction.category.icon,
-                    contentDescription = transaction.category.label,
+                    imageVector = category.icon,
+                    contentDescription = category.label,
                     modifier = Modifier.size(20.dp),
                     tint = Theme
                 )
@@ -207,9 +217,9 @@ fun TransactionItem(
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = if (showDate) {
-                    "${transaction.category.label} • ${transaction.date.toDisplayDate()}"
+                    "${category.label} • ${transaction.date.toDisplayDate()}"
                 } else {
-                    transaction.category.label
+                    category.label
                 },
                 color = Color.Gray,
                 fontSize = 11.sp

@@ -1,8 +1,10 @@
 package com.example.myduitgw.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.icons.rounded.Add
@@ -39,7 +41,6 @@ fun AppBottomBar(
                 .fillMaxWidth()
                 .height(72.dp),
             color = Color.White,
-            shadowElevation = 12.dp
         ) {
             Row(
                 modifier = Modifier
@@ -128,7 +129,8 @@ private fun AddTransactionButton(onClick: () -> Unit) {
                 .size(52.dp)
                 .shadow(elevation = 8.dp, shape = CircleShape),
             shape = CircleShape,
-            color = Theme
+            color = Theme,
+            border = BorderStroke(1.dp, Color.White)
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
