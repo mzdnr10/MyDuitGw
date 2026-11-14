@@ -12,28 +12,28 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-data class DashboardUiState(
+data class HomeUiState(
     val isLoading: Boolean = false,
-    val dashboard: JSONObject? = null,
+    val home: JSONObject? = null,
     val message: String? = null,
     val isError: Boolean = false,
     val userName: String = ""
 )
 
-class DashboardViewModel(
+class HomeViewModel(
     context: Context
 ) : ViewModel() {
 
     private val sessionManager = SessionManager(context.applicationContext)
 
-    private val dashboardApi = HomeApi(sessionManager)
+    private val homeApi = HomeApi(sessionManager)
 
-    private val dashboardRepository = HomeRepository(dashboardApi)
+    private val HomeRepository = HomeRepository(homeApi)
 
-    private val _uiState = MutableStateFlow(DashboardUiState())
+    private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun getDashboard() {
+    fun getHome() {
         viewModelScope.launch {
 
             _uiState.value = _uiState.value.copy(
@@ -41,11 +41,11 @@ class DashboardViewModel(
             )
 
             try {
-                val result = dashboardRepository.getDashboard()
+                val result = HomeRepository.getHome()
 
 
                 _uiState.value = _uiState.value.copy(
-                    dashboard = result,
+                    home = result,
                     isLoading = false
                 )
 

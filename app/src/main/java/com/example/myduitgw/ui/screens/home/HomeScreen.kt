@@ -64,7 +64,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.myduitgw.viewmodel.DashboardViewModel
+import com.example.myduitgw.viewmodel.HomeViewModel
 import org.json.JSONArray
 import com.example.myduitgw.data.model.Transaction
 import com.example.myduitgw.data.model.TransactionType
@@ -73,10 +73,14 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import com.example.myduitgw.ui.material.Grey200
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.layout.PaddingValues
 
 @Composable
 fun HomeScreen(
-    viewModel: DashboardViewModel,
+    viewModel: HomeViewModel,
     store: FinanceStore,
     onNavigate: (String) -> Unit,
 ) {
@@ -85,13 +89,17 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         viewModel.getUserName()
-        viewModel.getDashboard()
+        viewModel.getHome()
     }
 
-    val dashboardData = uiState.dashboard?.optJSONObject("data")
-    Log.d("data", "$dashboardData")
+    val homeData = uiState.home?.optJSONObject("data")
+    Log.d("data", "$homeData")
     val userName = uiState.userName
-    val balance = dashboardData?.optLong("balance") ?: 0Lval summary = store.summary()
+    val balanceData = homeData?.optJSONArray("balance")
+    val pagerState = rememberPagerState(
+        pageCount = { balanceData?.length() ?: 0 }
+    )
+    val summary = store.summary()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -185,72 +193,63 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(Spacing.Normal))
 
-            BalanceCard(
-                balance = balance,
-                userName = userName
-            )
+            if (balanceData != null && balanceData.length() > 0) {
+
+                HorizontalPager(
+                    state = pagerState,
+                    pageSize = PageSize.Fixed(300.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp),
+                    pageSpacing = 12.dp
+                ) { page ->
+
+                    val account = balanceData.getJSONObject(page)
+
+                    BalanceCard(
+                        accountName = account.optString("account_name"),
+                        accountType = "ACCOUNT",
+                        balance = account.optLong("balance"),
+                        userName = userName,
+                        accountColor = Color(0xFF216AC5),
+                        icon = if (
+                            account.optString("account_name").contains("DANA", true) ||
+                            account.optString("account_name").contains("PAY", true)
+                        ) Icons.Rounded.Wallet else Icons.Rounded.AccountBalance
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(Spacing.Normal))
 
-            var selectedAccount by remember {
-                mutableStateOf("Semua")
-            }
+//            var selectedAccount by remember {
+//                mutableStateOf("Semua")
+//            }
 
             Row(
-                modifier = Modifier.horizontalScroll(
-                    rememberScrollState()
-                ),
+                modifier = Modifier.horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                AccountSelectorItem(
-                    accountName = "Semua",
-                    accountColor = Theme,
-                    icon = Icons.Rounded.Wallet,
-                    selected = selectedAccount == "Semua",
-                    onClick = {
-                        selectedAccount = "Semua"
-                    }
-                )
+                if (balanceData != null) {
+                    for (i in 0 until balanceData.length()) {
 
-                AccountSelectorItem(
-                    accountName = "BCA",
-                    accountColor = Theme,
-                    icon = Icons.Rounded.AccountBalance,
-                    selected = selectedAccount == "BCA",
-                    onClick = {
-                        selectedAccount = "BCA"
-                    }
-                )
+                        val account = balanceData.getJSONObject(i)
+                        val accountName = account.optString("account_name")
 
-                AccountSelectorItem(
-                    accountName = "Mandiri",
-                    accountColor = Theme,
-                    icon = Icons.Rounded.AccountBalance,
-                    selected = selectedAccount == "Mandiri",
-                    onClick = {
-                        selectedAccount = "Mandiri"
+                        AccountSelectorItem(
+                            accountName = accountName,
+                            accountColor = Theme,
+                            icon = if (
+                                accountName.contains("DANA", true) ||
+                                accountName.contains("PAY", true)
+                            ) Icons.Rounded.Wallet else Icons.Rounded.AccountBalance,
+                            selected = pagerState.currentPage == i,
+                            onClick = {
+                                scope.launch {
+                                    pagerState.animateScrollToPage(i)
+                                }
+                            }
+                        )
                     }
-                )
-
-                AccountSelectorItem(
-                    accountName = "DANA",
-                    accountColor = Theme,
-                    icon = Icons.Rounded.Wallet,
-                    selected = selectedAccount == "DANA",
-                    onClick = {
-                        selectedAccount = "DANA"
-                    }
-                )
-
-                AccountSelectorItem(
-                    accountName = "Shopeepay",
-                    accountColor = Theme,
-                    icon = Icons.Rounded.AccountBalanceWallet,
-                    selected = selectedAccount == "Shopeepay",
-                    onClick = {
-                        selectedAccount = "Shopeepay"
-                    }
-                )
+                }
             }
 
             Spacer(modifier = Modifier.height(Spacing.Normal))
@@ -348,7 +347,7 @@ fun HomeScreen(
             }
 
             val recent_activity =
-                dashboardData?.optJSONArray("recent_transactions")
+                homeData?.optJSONArray("recent_transactions")
 
             val recentTransactions = buildList {
                 if (recent_activity != null) {
@@ -483,82 +482,58 @@ fun HomeScreen(
 }
 
 
+
 @Composable
 fun BalanceCard(
+    accountName: String,
+    accountType: String,
     balance: Long,
-    userName: String
+    userName: String,
+    accountColor: Color,
+    icon: ImageVector
 ) {
-    val cardShape = RoundedCornerShape(22.dp)
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(190.dp)
-            .clip(cardShape)
+            .clip(RoundedCornerShape(22.dp))
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(
-                        Theme,
-                        Color(0xFF3989F5),
-                        Color(0xFF2463C5)
+                        accountColor,
+                        accountColor.copy(alpha = 0.8f),
+                        accountColor.copy(alpha = 0.6f)
                     )
                 )
             )
+            .padding(18.dp)
     ) {
-
-        // Dekorasi background pertama
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .offset(x = 45.dp, y = 25.dp)
-                .size(170.dp)
-                .rotate(35f)
-                .background(
-                    Color.White.copy(alpha = 0.12f),
-                    RoundedCornerShape(40.dp)
-                )
-        )
-
-        // Dekorasi background kedua
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .offset(x = (-55).dp, y = 65.dp)
-                .size(100.dp)
-                .rotate(35f)
-                .background(
-                    Color.White.copy(alpha = 0.10f),
-                    RoundedCornerShape(30.dp)
-                )
-        )
-
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(18.dp),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
 
-            // Bagian atas
+            // HEADER
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "MYDUITGW",
+                    text = accountName.uppercase(),
                     color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold
                 )
 
-                Text(
-                    text = "WALLET",
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 11.sp
+                Icon(
+                    imageVector = icon,
+                    contentDescription = accountName,
+                    tint = Color.White,
+                    modifier = Modifier.size(28.dp)
                 )
             }
 
-            // Bagian saldo
+            // BALANCE
             Column {
                 Text(
                     text = "TOTAL SALDO",
@@ -574,11 +549,10 @@ fun BalanceCard(
                 )
             }
 
-            // Bagian bawah
+            // FOOTER
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = userName,
@@ -587,14 +561,15 @@ fun BalanceCard(
                 )
 
                 Text(
-                    text = "MY PERSONAL WALLET",
+                    text = accountType.uppercase(),
                     color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 9.sp
+                    fontSize = 10.sp
                 )
             }
         }
     }
 }
+
 
 @Composable
 fun AccountSelectorItem(

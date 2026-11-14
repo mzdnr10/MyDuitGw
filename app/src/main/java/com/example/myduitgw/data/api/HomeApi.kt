@@ -8,17 +8,16 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.stream.Stream
 
-class DashboardApi(
+class HomeApi(
     private val sessionManager: SessionManager
 ) {
     companion object {
         private const val ENDPOINT =
-            "https://myduitgue-backend.ethiodeploy.app/api/dashboard"
+            "https://myduitgue-backend.ethiodeploy.app/api/home"
     }
 
-    suspend fun getDashboard(): JSONObject = withContext(Dispatchers.IO) {
+    suspend fun getHome(): JSONObject = withContext(Dispatchers.IO) {
 
         val token = sessionManager.getToken()
         Log.d("", "$token")

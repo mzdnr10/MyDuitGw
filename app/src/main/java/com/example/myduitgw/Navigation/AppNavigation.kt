@@ -37,7 +37,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
-import com.example.myduitgw.viewmodel.DashboardViewModel
+import com.example.myduitgw.viewmodel.HomeViewModel
 
 @Composable
 fun AppNavigation() {
@@ -55,10 +55,10 @@ fun AppNavigation() {
         }
     )
 
-    val dashboardViewModel: DashboardViewModel = viewModel(
+    val homeViewModel: HomeViewModel = viewModel(
         factory = viewModelFactory {
             initializer {
-                DashboardViewModel(
+                HomeViewModel(
                     context = context.applicationContext
                 )
             }
@@ -232,7 +232,7 @@ fun AppNavigation() {
             ) {
                 HomeScreen(
                     store = store,
-                    viewModel = dashboardViewModel,
+                    viewModel = homeViewModel,
                     onNavigate = { route ->
                         if (route in Routes.bottomBarRoutes) {
                             navController.navigate(route) {
