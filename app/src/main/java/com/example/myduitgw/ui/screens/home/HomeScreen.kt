@@ -14,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountBalanceWallet
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
@@ -51,7 +50,6 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.rounded.AccountBalance
 import androidx.compose.material.icons.rounded.MoreHoriz
@@ -65,11 +63,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.example.myduitgw.viewmodel.HomeViewModel
-import org.json.JSONArray
 import com.example.myduitgw.data.model.Transaction
 import com.example.myduitgw.data.model.TransactionType
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import com.example.myduitgw.ui.material.Grey200
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -77,6 +73,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.CircularProgressIndicator
 
 @Composable
 fun HomeScreen(
@@ -193,7 +190,26 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(Spacing.Normal))
 
-            if (balanceData != null && balanceData.length() > 0) {
+            if (uiState.isLoading && homeData == null) {
+
+                HorizontalPager(
+                    state = rememberPagerState(pageCount = { 2 }),
+                    pageSize = PageSize.Fixed(300.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp),
+                    pageSpacing = 12.dp
+                ) {
+                    BalanceCard(
+                        accountName = "SEMUA",
+                        accountType = "ACCOUNT",
+                        balance = 0,
+                        userName = userName,
+                        accountColor = Color(0xFF216AC5),
+                        icon = Icons.Rounded.AccountBalance
+                    )
+                }
+
+
+            } else if (balanceData != null && balanceData.length() > 0) {
 
                 HorizontalPager(
                     state = pagerState,
@@ -209,7 +225,9 @@ fun HomeScreen(
                         accountType = "ACCOUNT",
                         balance = account.optLong("balance"),
                         userName = userName,
-                        accountColor = Color(0xFF216AC5),
+                        accountColor = getAccountColor(
+                            account.optInt("account_id")
+                        ),
                         icon = if (
                             account.optString("account_name").contains("DANA", true) ||
                             account.optString("account_name").contains("PAY", true)
@@ -219,10 +237,6 @@ fun HomeScreen(
             }
 
             Spacer(modifier = Modifier.height(Spacing.Normal))
-
-//            var selectedAccount by remember {
-//                mutableStateOf("Semua")
-//            }
 
             Row(
                 modifier = Modifier.horizontalScroll(rememberScrollState()),
@@ -249,12 +263,50 @@ fun HomeScreen(
                             }
                         )
                     }
+                } else{
+                    AccountSelectorItem(
+                        accountName = "SEMUA",
+                        accountColor = Theme,
+                        icon = Icons.Rounded.AccountBalance,
+                        selected = true,
+                        onClick = {
+
+                        }
+                    )
+                    AccountSelectorItem(
+                        accountName = "BRI",
+                        accountColor = Theme,
+                        icon = Icons.Rounded.AccountBalance,
+                        selected = false,
+                        onClick = {
+
+                        }
+                    )
+
+                    AccountSelectorItem(
+                        accountName = "MANDIRI",
+                        accountColor = Theme,
+                        icon = Icons.Rounded.AccountBalance,
+                        selected = false,
+                        onClick = {
+
+                        }
+                    )
+
+                    AccountSelectorItem(
+                        accountName = "BCA",
+                        accountColor = Theme,
+                        icon = Icons.Rounded.AccountBalance,
+                        selected = false,
+                        onClick = {
+
+                        }
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(Spacing.Normal))
 
-            // RINGKASAN BULAN INI
             FinanceCard(
                 onClick = {
                     onNavigate(Routes.STATISTICS)
@@ -288,7 +340,7 @@ fun HomeScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(Spacing.Medium))
+                Spacer(modifier = Modifier.height(Spacing.Normal))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -615,109 +667,15 @@ fun AccountSelectorItem(
     }
 }
 
-@Composable
-fun RecentTransactionCard(
-    transactions: List<Transaction>,
-    onSeeAll: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var searchQuery by remember {
-        mutableStateOf("")
-    }
 
-    val filteredTransactions = transactions.filter {
-        it.title.contains(searchQuery, ignoreCase = true)
-    }
-
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        color = Color.White,
-        shadowElevation = 3.dp
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-
-            // HEADER
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Recent Transaction",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF222222)
-                )
-
-                IconButton(
-                    onClick = onSeeAll
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.MoreHoriz,
-                        contentDescription = "Lihat semua transaksi",
-                        tint = Color.Gray
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // SEARCH
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = {
-                    searchQuery = it
-                },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = {
-                    Text(
-                        text = "Search transaction",
-                        fontSize = 12.sp,
-                        color = Color.LightGray
-                    )
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Rounded.Search,
-                        contentDescription = "Search",
-                        tint = Color.LightGray,
-                        modifier = Modifier.size(18.dp)
-                    )
-                },
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color(0xFFEEEEEE),
-                    focusedBorderColor = Color(0xFF3989F5),
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White
-                )
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // TRANSACTION LIST
-            if (filteredTransactions.isEmpty()) {
-                Text(
-                    text = "Tidak ada transaksi",
-                    color = Color.Gray,
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(vertical = 12.dp)
-                )
-            } else {
-                filteredTransactions.take(3).forEach { transaction ->
-
-                    TransactionItem(
-                        transaction = transaction
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-            }
-        }
+fun getAccountColor(accountId: Int): Color {
+    return when (accountId) {
+        0 -> Color(0xFF216AC5) // Semua
+        1 -> Color(0xFF1E4DB7) // Mandiri
+        2 -> Color(0xFF00A86B) // BRI
+        3 -> Color(0xFF0084D6) // DANA
+        4 -> Color(0xFFEE4D2D) // ShopeePay
+        else -> Color(0xFF7952B3)
     }
 }
 

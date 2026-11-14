@@ -12,7 +12,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -32,12 +31,25 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.Alignment
 import com.example.myduitgw.viewmodel.HomeViewModel
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.unit.dp
+import com.example.myduitgw.ui.material.Theme
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.Modifier
 
 @Composable
 fun AppNavigation() {
@@ -66,6 +78,7 @@ fun AppNavigation() {
     )
     
     val authUiState by authViewModel.uiState.collectAsState()
+    val homeUiState by homeViewModel.uiState.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -247,6 +260,34 @@ fun AppNavigation() {
                         }
                     }
                 )
+            }
+        }
+    }
+
+    if (homeUiState.isLoading && homeUiState.home == null) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.25f))
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {},
+            contentAlignment = Alignment.Center
+        ) {
+            Surface(
+                modifier = Modifier.size(90.dp),
+                shape = RoundedCornerShape(18.dp),
+                color = Color.White,
+                shadowElevation = 8.dp
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(
+                        color = Theme,
+                        strokeWidth = 3.dp,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
             }
         }
     }

@@ -64,4 +64,5 @@ dependencies {
     implementation("androidx.credentials:credentials-play-services-auth:1.6.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
     implementation("androidx.datastore:datastore-preferences:1.1.7")
+    implementation("com.valentinilk.shimmer:compose-shimmer:1.3.3")
 }
