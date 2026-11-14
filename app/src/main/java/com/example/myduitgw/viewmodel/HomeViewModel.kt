@@ -3,17 +3,14 @@ package com.example.myduitgw.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myduitgw.data.api.DashboardApi
-import com.example.myduitgw.data.repository.DashboardRepository
+import com.example.myduitgw.data.api.HomeApi
+import com.example.myduitgw.data.repository.HomeRepository
 import com.example.myduitgw.data.repository.SessionManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.time.LocalDate
-
-import android.util.Log
 
 data class DashboardUiState(
     val isLoading: Boolean = false,
@@ -29,9 +26,9 @@ class DashboardViewModel(
 
     private val sessionManager = SessionManager(context.applicationContext)
 
-    private val dashboardApi = DashboardApi(sessionManager)
+    private val dashboardApi = HomeApi(sessionManager)
 
-    private val dashboardRepository = DashboardRepository(dashboardApi)
+    private val dashboardRepository = HomeRepository(dashboardApi)
 
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState = _uiState.asStateFlow()
