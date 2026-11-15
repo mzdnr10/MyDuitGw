@@ -244,7 +244,6 @@ fun AppNavigation() {
                 enterTransition = { EnterTransition.None },
             ) {
                 HomeScreen(
-                    store = store,
                     viewModel = homeViewModel,
                     onNavigate = { route ->
                         if (route in Routes.bottomBarRoutes) {

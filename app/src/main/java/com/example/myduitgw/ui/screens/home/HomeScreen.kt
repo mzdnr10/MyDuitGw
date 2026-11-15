@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myduitgw.data.repository.FinanceStore
 import com.example.myduitgw.data.repository.MockData
 import com.example.myduitgw.navigation.Routes
 import com.example.myduitgw.ui.components.DualLineChart
@@ -73,12 +72,12 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.fillMaxHeight
+import com.example.myduitgw.data.model.DailyExpense
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    store: FinanceStore,
     onNavigate: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -86,20 +85,24 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         viewModel.getUserName()
-        viewModel.getHome()
+        viewModel.getHomeData()
     }
 
     val homeData = uiState.home?.optJSONObject("data")
-    Log.d("data", "$homeData")
     val userName = uiState.userName
     val balanceData = homeData?.optJSONArray("balance")
     val pagerState = rememberPagerState(
         pageCount = { balanceData?.length() ?: 0 }
     )
-    val summary = store.summary()
+
+
+    val weeklyExpense = uiState.weeklyExpense?.optJSONObject("data")
+    val totalExpense = weeklyExpense?.optLong("total_expense") ?: 0L
+    val dailyExpensesJson = weeklyExpense?.optJSONArray("daily_expenses")
+
+
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-
     val scrollState = rememberScrollState()
 
     Box(
@@ -307,92 +310,47 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(Spacing.Normal))
 
-            FinanceCard(
-                onClick = {
-                    onNavigate(Routes.STATISTICS)
-                }
-            ) {
-                Text(
-                    text = "Ringkasan Bulan Ini",
-                    color = Color.Black,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+            val dailyExpenses = buildList {
 
-                Spacer(modifier = Modifier.height(Spacing.Small))
+                if (dailyExpensesJson != null && dailyExpensesJson.length() > 0) {
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = LocalDate.now()
-                            .toMonthYear()
-                            .replaceFirstChar { it.titlecase() },
-                        color = Color.Gray,
-                        fontSize = 11.sp
-                    )
+                    for (i in 0 until dailyExpensesJson.length()) {
+                        val item = dailyExpensesJson.getJSONObject(i)
 
-                    Text(
-                        text = "Lihat statistik",
-                        color = Theme,
-                        fontSize = 11.sp
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(Spacing.Normal))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.width(86.dp)) {
-                        Text(
-                            text = "Pemasukan",
-                            color = Color.DarkGray,
-                            fontSize = 11.sp
-                        )
-
-                        Spacer(modifier = Modifier.height(Spacing.Medium))
-
-                        Text(
-                            text = "Pengeluaran",
-                            color = Color.DarkGray,
-                            fontSize = 11.sp
+                        add(
+                            DailyExpense(
+                                date = item.getString("date"),
+                                day = item.getString("day_name"),
+                                expense = item.getLong("expense")
+                            )
                         )
                     }
 
-                    DualLineChart(
-                        incomePoints = MockData.incomeTrend,
-                        expensePoints = MockData.expenseTrend,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp)
-                    )
+                } else {
 
-                    Spacer(modifier = Modifier.width(Spacing.Medium))
+                    val today = java.time.LocalDate.now()
+                    val dayNames = listOf("Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min")
 
-                    Column(horizontalAlignment = Alignment.End) {
-                        Text(
-                            text = summary.monthlyIncome.toCompactRupiah(),
-                            color = FinanceColors.Income,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium
-                        )
+                    for (i in 6 downTo 0) {
+                        val date = today.minusDays(i.toLong())
 
-                        Spacer(modifier = Modifier.height(Spacing.Normal))
-
-                        Text(
-                            text = summary.monthlyExpense.toCompactRupiah(),
-                            color = Theme,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium
+                        add(
+                            DailyExpense(
+                                date = date.toString(),
+                                day = dayNames[date.dayOfWeek.value - 1],
+                                expense = 0L
+                            )
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(Spacing.Large))
+            WeeklyExpenseCard(
+                totalExpense = totalExpense,
+                dailyExpenses = dailyExpenses
+            )
+
+            Spacer(modifier = Modifier.height(Spacing.Normal))
 
             var searchQuery by remember {
                 mutableStateOf("")
@@ -667,6 +625,104 @@ fun AccountSelectorItem(
     }
 }
 
+@Composable
+fun WeeklyExpenseCard(
+    totalExpense: Long,
+    dailyExpenses: List<DailyExpense>,
+    modifier: Modifier = Modifier
+) {
+    val maxExpense = (dailyExpenses.maxOfOrNull { it.expense } ?: 0L)
+        .coerceAtLeast(1L)
+
+    val currencyFormat = remember {
+        java.text.NumberFormat.getCurrencyInstance(
+            java.util.Locale("id", "ID")
+        ).apply {
+            maximumFractionDigits = 0
+        }
+    }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = Color.White,
+        shadowElevation = 2.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)
+        ) {
+            // Header
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = "Pengeluaran 7 Hari Terakhir",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black
+                )
+
+                Text(
+                    text = "Total pengeluaran",
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+
+                Text(
+                    text = currencyFormat.format(totalExpense),
+                    fontSize = 23.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Theme
+                )
+            }
+
+            // Bar Chart
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(130.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                dailyExpenses.forEach { item ->
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Bottom
+                    ) {
+                        val barHeight = (
+                                item.expense.toFloat() / maxExpense
+                                ).coerceIn(0f, 1f)
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(95.dp),
+                            contentAlignment = Alignment.BottomCenter
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.75f)
+                                    .fillMaxHeight(
+                                        if (item.expense > 0) barHeight else 0.025f
+                                    )
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(Theme.copy(alpha = 0.85f))
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = item.day,
+                            fontSize = 11.sp,
+                            color = Color.Gray
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
 
 fun getAccountColor(accountId: Int): Color {
     return when (accountId) {

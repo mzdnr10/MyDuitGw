@@ -9,4 +9,8 @@ class HomeRepository(
     suspend fun getHome(): JSONObject {
         return HomeApi.getHome()
     }
+
+    suspend fun getWeeklyExpense(): JSONObject {
+        return HomeApi.getWeeklyExpense()
+    }
 }
