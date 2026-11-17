@@ -2,6 +2,7 @@
 package com.example.myduitgw.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myduitgw.data.api.HomeApi
@@ -12,6 +13,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
@@ -21,7 +23,8 @@ data class HomeUiState(
     val weeklyExpense: JSONObject? = null,
     val message: String? = null,
     val isError: Boolean = false,
-    val userName: String = ""
+    val userName: String = "",
+    val isLoggedOut: Boolean = false
 )
 
 class HomeViewModel(
@@ -91,6 +94,21 @@ class HomeViewModel(
             _uiState.value = _uiState.value.copy(
                 userName = name.orEmpty()
             )
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            sessionManager.clearSession()
+
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    isLoggedOut = true,
+                    message = null,
+                    isError = false
+                )
+            }
         }
     }
 }

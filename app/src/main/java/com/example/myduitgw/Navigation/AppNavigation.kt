@@ -54,7 +54,6 @@ import androidx.compose.ui.Modifier
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    val store = remember { FinanceStore() }
     val context = LocalContext.current
     var splashFinished by remember { mutableStateOf(false) }
     val authViewModel: GoogleAuthViewModel = viewModel(
@@ -95,6 +94,22 @@ fun AppNavigation() {
             if (authUiState.isError) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
         ).show()
         authViewModel.clearMessage()
+    }
+
+    LaunchedEffect(homeUiState.isLoggedOut) {
+        if (homeUiState.isLoggedOut) {
+
+            // Update status autentikasi
+            authViewModel.onLogout()
+
+            // Navigasi ke Welcome
+            navController.navigate(Routes.WELCOME) {
+                popUpTo(Routes.HOME) {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
+        }
     }
 
     LaunchedEffect(
@@ -162,12 +177,23 @@ fun AppNavigation() {
                     AppBottomBar(
                         currentRoute = currentRoute,
                         onNavigateTab = { route ->
-                            navController.navigate(route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+
+                            if (route == currentRoute) {
+
+                                // Kalau sedang di Home, refresh data saja
+                                if (route == Routes.HOME) {
+                                    homeViewModel.getHomeData()
                                 }
-                                launchSingleTop = true
-                                restoreState = true
+
+                            } else {
+
+                                navController.navigate(route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
                             }
                         },
                         onAddTransaction = {
@@ -257,13 +283,16 @@ fun AppNavigation() {
                         } else {
                             navController.navigate(route)
                         }
+                    },
+                    onLogout = {
+                        homeViewModel.logout()
                     }
                 )
             }
         }
     }
 
-    if (homeUiState.isLoading && homeUiState.home == null) {
+    if (homeUiState.isLoading) {
         Box(
             modifier = Modifier
                 .fillMaxSize()

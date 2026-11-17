@@ -104,4 +104,14 @@ class GoogleAuthViewModel(
     fun clearMessage() {
         _uiState.value = _uiState.value.copy(message = null, isError = false)
     }
+
+    fun onLogout() {
+        _uiState.value = _uiState.value.copy(
+            isAuthenticated = false,
+            isLoading = false,
+            isCheckingSession = false,
+            message = null,
+            isError = false
+        )
+    }
 }

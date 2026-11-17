@@ -17,6 +17,9 @@ class HomeApi(
 
         private const val WEEKLYEXPENSE =
             "https://myduitgue-backend.ethiodeploy.app/api/home/weekly_expense"
+
+        private const val LOGOUT =
+            "https://myduitgue-backend.ethiodeploy.app/api/logout"
     }
 
     suspend fun getHome(): JSONObject {

@@ -73,12 +73,17 @@ import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.material.icons.rounded.Logout
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import com.example.myduitgw.data.model.DailyExpense
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigate: (String) -> Unit,
+    onLogout: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -168,16 +173,45 @@ fun HomeScreen(
                         )
                     }
 
-                    IconButton(
-                        onClick = {
-                            onNavigate(Routes.PROFILE)
+                    var expanded by remember { mutableStateOf(false) }
+
+                    Box {
+                        IconButton(
+                            onClick = { expanded = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Settings,
+                                contentDescription = "Pengaturan",
+                                tint = Color.Black
+                            )
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Settings,
-                            contentDescription = "Pengaturan",
-                            tint = Color.Black
-                        )
+
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Profile") },
+                                onClick = {
+                                    expanded = false
+                                    onNavigate(Routes.PROFILE)
+                                },
+                                leadingIcon = {
+                                    Icon(Icons.Rounded.Person, contentDescription = null)
+                                }
+                            )
+
+                            DropdownMenuItem(
+                                text = { Text("Logout") },
+                                onClick = {
+                                    expanded = false
+                                    onLogout()
+                                },
+                                leadingIcon = {
+                                    Icon(Icons.Rounded.Logout, contentDescription = null)
+                                }
+                            )
+                        }
                     }
                 }
             }
