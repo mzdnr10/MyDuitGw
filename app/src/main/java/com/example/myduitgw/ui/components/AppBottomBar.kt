@@ -25,6 +25,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.myduitgw.navigation.Routes
 import com.example.myduitgw.ui.material.Theme
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.runtime.*
+import androidx.compose.ui.draw.alpha
+import androidx.compose.material.icons.rounded.SwapHoriz
+import androidx.compose.material.icons.rounded.ArrowDownward
+import androidx.compose.material.icons.rounded.ArrowUpward
+import androidx.compose.material.icons.rounded.Image
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.ui.text.font.FontWeight
+
+
 
 @Composable
 fun AppBottomBar(
@@ -32,15 +45,98 @@ fun AppBottomBar(
     onNavigateTab: (String) -> Unit,
     onAddTransaction: () -> Unit
 ) {
+    var expanded by remember { mutableStateOf(false) }
+
+    val menuItems = listOf(
+        Triple(
+            Icons.Rounded.ArrowUpward,
+            Color(0xFFD84343),
+            "Expense"
+        ),
+        Triple(
+            Icons.Rounded.ArrowDownward,
+            Color(0xFF239653),
+            "Income"
+        ),
+        Triple(
+            Icons.Rounded.SwapHoriz,
+            Color(0xFF3478D4),
+            "Transfer"
+        ),
+        Triple(
+            Icons.Rounded.Image,
+            Color(0xFF8950C9),
+            "Scan Receipt"
+        )
+    )
+
     Box(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(72.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
+
+        // QUICK MENU
+        AnimatedVisibility(
+            visible = expanded,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = (-90).dp)
+                .zIndex(3f),
+            enter = fadeIn(tween(200)) +
+                    scaleIn(
+                        initialScale = 0.8f,
+                        animationSpec = tween(200)
+                    ),
+            exit = fadeOut(tween(150)) +
+                    scaleOut(
+                        targetScale = 0.8f,
+                        animationSpec = tween(150)
+                    )
+        ) {
+            Surface(
+                shape = RoundedCornerShape(40.dp),
+                color = Color.White,
+                shadowElevation = 8.dp
+            ) {
+                Row(
+                    modifier = Modifier.padding(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    menuItems.forEach { item ->
+
+                        Surface(
+                            onClick = {
+                                expanded = false
+                            },
+                            modifier = Modifier.size(52.dp),
+                            shape = CircleShape,
+                            color = item.second.copy(alpha = 0.13f)
+                        ) {
+                            Box(
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = item.first,
+                                    contentDescription = item.third,
+                                    tint = item.second,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // BOTTOM NAVIGATION
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(72.dp),
-            color = Color.White,
+            color = Color.White
         ) {
             Row(
                 modifier = Modifier
@@ -53,33 +149,56 @@ fun AppBottomBar(
                     icon = Icons.Rounded.Home,
                     label = "Home",
                     selected = currentRoute == Routes.HOME,
-                    onClick = { onNavigateTab(Routes.HOME) }
+                    onClick = {
+                        expanded = false
+                        onNavigateTab(Routes.HOME)
+                    }
                 )
+
                 BottomBarItem(
                     icon = Icons.AutoMirrored.Rounded.List,
                     label = "Transaksi",
                     selected = currentRoute == Routes.TRANSACTIONS,
-                    onClick = { onNavigateTab(Routes.TRANSACTIONS) }
+                    onClick = {
+                        expanded = false
+                        onNavigateTab(Routes.TRANSACTIONS)
+                    }
                 )
+
                 Box(Modifier.size(68.dp))
+
                 BottomBarItem(
                     icon = Icons.Rounded.Savings,
                     label = "Tabungan",
                     selected = currentRoute == Routes.SAVINGS,
-                    onClick = { onNavigateTab(Routes.SAVINGS) }
+                    onClick = {
+                        expanded = false
+                        onNavigateTab(Routes.SAVINGS)
+                    }
                 )
+
                 BottomBarItem(
                     icon = Icons.Rounded.Person,
                     label = "Profil",
                     selected = currentRoute == Routes.PROFILE,
-                    onClick = { onNavigateTab(Routes.PROFILE) }
+                    onClick = {
+                        expanded = false
+                        onNavigateTab(Routes.PROFILE)
+                    }
                 )
             }
         }
 
-        AddTransactionButton(onClick = onAddTransaction)
+        // ADD BUTTON
+        AddTransactionButton(
+            expanded = expanded,
+            onClick = {
+                expanded = !expanded
+            }
+        )
     }
 }
+
 
 @Composable
 private fun BottomBarItem(
@@ -104,6 +223,7 @@ private fun BottomBarItem(
                 modifier = Modifier.size(23.dp),
                 tint = if (selected) Theme else Color.Gray
             )
+
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
@@ -114,8 +234,12 @@ private fun BottomBarItem(
     }
 }
 
+
 @Composable
-private fun AddTransactionButton(onClick: () -> Unit) {
+private fun AddTransactionButton(
+    expanded: Boolean,
+    onClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .size(68.dp)
@@ -127,14 +251,22 @@ private fun AddTransactionButton(onClick: () -> Unit) {
             onClick = onClick,
             modifier = Modifier
                 .size(52.dp)
-                .shadow(elevation = 8.dp, shape = CircleShape),
+                .shadow(
+                    elevation = 8.dp,
+                    shape = CircleShape
+                ),
             shape = CircleShape,
             color = Theme,
             border = BorderStroke(1.dp, Color.White)
         ) {
-            Box(contentAlignment = Alignment.Center) {
+            Box(
+                contentAlignment = Alignment.Center
+            ) {
                 Icon(
-                    imageVector = Icons.Rounded.Add,
+                    imageVector = if (expanded)
+                        Icons.Rounded.Close
+                    else
+                        Icons.Rounded.Add,
                     contentDescription = "Tambah Transaksi",
                     modifier = Modifier.size(26.dp),
                     tint = Color.White

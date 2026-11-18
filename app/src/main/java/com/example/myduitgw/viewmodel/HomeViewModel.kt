@@ -111,4 +111,10 @@ class HomeViewModel(
             }
         }
     }
+
+    fun resetLogoutState() {
+        _uiState.update {
+            it.copy(isLoggedOut = false)
+        }
+    }
 }

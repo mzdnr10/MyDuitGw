@@ -109,6 +109,8 @@ fun AppNavigation() {
                 }
                 launchSingleTop = true
             }
+
+            homeViewModel.resetLogoutState()
         }
     }
 
