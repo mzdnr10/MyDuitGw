@@ -29,8 +29,11 @@ import kotlinx.coroutines.launch
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.lifecycle.viewmodel.initializer
@@ -50,6 +53,7 @@ import com.example.myduitgw.ui.material.Theme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.Modifier
+import com.example.myduitgw.ui.transaction.IncomeScreen
 
 @Composable
 fun AppNavigation() {
@@ -198,8 +202,8 @@ fun AppNavigation() {
                                 }
                             }
                         },
-                        onAddTransaction = {
-                            navController.navigate(Routes.ADD_TRANSACTION)
+                        onIncomeClick = {
+                            navController.navigate(Routes.INCOME)
                         }
                     )
                 }
@@ -210,21 +214,45 @@ fun AppNavigation() {
             navController = navController,
             startDestination = Routes.SPLASH,
             modifier = Modifier.padding(innerPadding),
-            enterTransition = { slideInVertically(
-                initialOffsetY = { -it },
-                animationSpec = tween(1000)
-            ) },
-            exitTransition = {
-                fadeOut(
-                    animationSpec = tween(3000)
+
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { it / 5 },
+                    animationSpec = tween(250)
+                ) + fadeIn(
+                    animationSpec = tween(200)
                 )
             },
-            popEnterTransition = { EnterTransition.None },
-            popExitTransition = { ExitTransition.None }
+
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -it / 5 },
+                    animationSpec = tween(250)
+                ) + fadeOut(
+                    animationSpec = tween(200)
+                )
+            },
+
+            popEnterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { -it / 5 },
+                    animationSpec = tween(250)
+                ) + fadeIn(
+                    animationSpec = tween(200)
+                )
+            },
+
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { it / 5 },
+                    animationSpec = tween(250)
+                ) + fadeOut(
+                    animationSpec = tween(200)
+                )
+            }
         ) {
             composable(
                 Routes.SPLASH,
-                enterTransition = { EnterTransition.None },
             ) {
                 SplashScreen(
                     playLogoAnimation = !authUiState.isAuthenticated,
@@ -269,7 +297,6 @@ fun AppNavigation() {
 
             composable(
                 Routes.HOME,
-                enterTransition = { EnterTransition.None },
             ) {
                 HomeScreen(
                     viewModel = homeViewModel,
@@ -288,6 +315,16 @@ fun AppNavigation() {
                     },
                     onLogout = {
                         homeViewModel.logout()
+                    }
+                )
+            }
+            composable(Routes.INCOME) {
+                IncomeScreen(
+                    onBack = {
+                        navController.popBackStack()
+                    },
+                    onSave = {
+                        // Nanti kita sambungkan ke proses simpan transaksi
                     }
                 )
             }

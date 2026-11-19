@@ -43,7 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 fun AppBottomBar(
     currentRoute: String?,
     onNavigateTab: (String) -> Unit,
-    onAddTransaction: () -> Unit
+    onIncomeClick: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -106,10 +106,13 @@ fun AppBottomBar(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     menuItems.forEach { item ->
-
                         Surface(
                             onClick = {
                                 expanded = false
+
+                                if (item.third == "Income") {
+                                    onIncomeClick()
+                                }
                             },
                             modifier = Modifier.size(52.dp),
                             shape = CircleShape,
