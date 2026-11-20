@@ -6,20 +6,31 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.Wallet
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myduitgw.ui.material.Theme
@@ -65,14 +76,14 @@ fun IncomeScreen(
         "Cash"
     )
 
-    val formattedAmount = remember(amount) {
-        if (amount.isBlank()) {
-            ""
-        } else {
-            NumberFormat.getNumberInstance(Locale("id", "ID"))
-                .format(amount.toLongOrNull() ?: 0L)
-        }
-    }
+//    val formattedAmount = remember(amount) {
+//        if (amount.isBlank()) {
+//            "0"
+//        } else {
+//            NumberFormat.getNumberInstance(Locale("id", "ID"))
+//                .format(amount.toLongOrNull() ?: 0L)
+//        }
+//    }
 
     val formattedDate = remember(selectedDate) {
         SimpleDateFormat(
@@ -86,6 +97,20 @@ fun IncomeScreen(
             amount.toLongOrNull()!! > 0 &&
             selectedCategory.isNotBlank() &&
             selectedAccount.isNotBlank()
+
+    var isAmountFocused by remember { mutableStateOf(false) }
+    var hasAmountInteracted by remember { mutableStateOf(false) }
+
+    val isAmountZero = amount.toLongOrNull() == null ||
+            amount.toLongOrNull() == 0L
+
+    val showAmountError = hasAmountInteracted &&
+            isAmountZero &&
+            !isAmountFocused
+
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
 
     Column(
         modifier = Modifier
@@ -138,65 +163,117 @@ fun IncomeScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(20.dp)
                 ) {
                     Text(
-                        text = "Jumlah Pemasukan",
-                        color = Color.Gray,
-                        fontSize = 13.sp
+                        text = "Nominal",
+                        color = if (showAmountError) Color.Red else Color.Black,
+                        fontSize = 16.sp
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(9.dp))
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Rp",
-                            color = Theme,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        TextField(
-                            value = formattedAmount,
-                            onValueChange = { input ->
-                                amount = input.filter { it.isDigit() }
-                            },
-                            placeholder = {
-                                Text(
-                                    "0",
-                                    color = Color.LightGray
-                                )
-                            },
-                            textStyle = LocalTextStyle.current.copy(
+                    Column {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Rp",
+                                color = Color.Black,
                                 fontSize = 30.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Theme
-                            ),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number
-                            ),
-                            singleLine = true,
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent
-                            ),
-                            modifier = Modifier.widthIn(max = 250.dp)
+                                fontWeight = FontWeight.Bold
+                            )
+                            var textFieldValue by remember {
+                                mutableStateOf(TextFieldValue("0"))
+                            }
+
+                            Spacer(modifier = Modifier.width(9.dp))
+
+                            BasicTextField(
+                                value = textFieldValue,
+                                onValueChange = { input ->
+                                    hasAmountInteracted = true
+
+                                    val digits = input.text.filter { it.isDigit() }
+
+                                    amount = digits
+                                        .trimStart('0')
+                                        .ifEmpty { "0" }
+
+                                    val formatted = NumberFormat.getNumberInstance(Locale("id", "ID"))
+                                        .format(amount.toLongOrNull() ?: 0L)
+
+                                    textFieldValue = TextFieldValue(
+                                        text = formatted,
+                                        selection = TextRange(formatted.length)
+                                    )
+                                },
+                                textStyle = TextStyle(
+                                    fontSize = 30.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
+                                ),
+                                cursorBrush = SolidColor(Theme),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        focusManager.clearFocus()
+                                        keyboardController?.hide()
+                                    }
+                                ),
+                                singleLine = true,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .onFocusChanged {
+                                        isAmountFocused = it.isFocused
+                                    }
+                            )
+
+                            IconButton(
+                                onClick = {
+                                    hasAmountInteracted = true
+                                    amount = "0"
+                                    textFieldValue = TextFieldValue(
+                                        text = "0",
+                                        selection = TextRange(1)
+                                    )
+                                },
+                                modifier = Modifier.size(32.dp),
+                                colors = IconButtonDefaults.iconButtonColors(
+                                    containerColor = Color(0xFFF1F3F5),
+                                    contentColor = Color.Gray
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Close,
+                                    contentDescription = "Clear",
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .background(
+                                    if (isAmountFocused) Theme
+                                    else Color.Transparent
+                                )
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
+                    // Garis bawah input
+                    Spacer(modifier = Modifier.height(3.dp))
                     Text(
                         text = "Masukkan nominal uang yang diterima",
-                        color = Color.Gray,
-                        fontSize = 11.sp
+                        color = if (showAmountError) Color.Red else Color.Black,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 6.dp)
                     )
                 }
             }
