@@ -1,6 +1,7 @@
 
 package com.example.myduitgw.ui.transaction
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myduitgw.ui.material.Theme
+import com.example.myduitgw.viewmodel.IncomeViewModel
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -44,9 +46,13 @@ private val IncomeBackground = Color(0xFFF5F6F8)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IncomeScreen(
+    viewModel: IncomeViewModel,
     onBack: () -> Unit,
     onSave: () -> Unit
 ){
+    LaunchedEffect(Unit) {
+        viewModel.getIncomeData()
+    }
     var amount by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("") }
     var selectedAccount by remember { mutableStateOf("") }

@@ -54,6 +54,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.Modifier
 import com.example.myduitgw.ui.transaction.IncomeScreen
+import com.example.myduitgw.viewmodel.IncomeViewModel
 
 @Composable
 fun AppNavigation() {
@@ -79,9 +80,20 @@ fun AppNavigation() {
             }
         }
     )
+
+    val incomeViewModel: IncomeViewModel = viewModel(
+        factory = viewModelFactory {
+            initializer {
+                IncomeViewModel(
+                    context = context.applicationContext
+                )
+            }
+        }
+    )
     
     val authUiState by authViewModel.uiState.collectAsState()
     val homeUiState by homeViewModel.uiState.collectAsState()
+    val incomeUiState by incomeViewModel.uiState.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -130,7 +142,7 @@ fun AppNavigation() {
                     !authUiState.isCheckingSession -> {
 
                 val destination = if (authUiState.isAuthenticated) {
-                    Routes.HOME
+                    Routes.INCOME
                 } else {
                     Routes.WELCOME
                 }
@@ -320,6 +332,8 @@ fun AppNavigation() {
             }
             composable(Routes.INCOME) {
                 IncomeScreen(
+
+                    viewModel = incomeViewModel,
                     onBack = {
                         navController.popBackStack()
                     },
@@ -331,7 +345,7 @@ fun AppNavigation() {
         }
     }
 
-    if (homeUiState.isLoading) {
+    if (homeUiState.isLoading || incomeUiState.isLoading ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
