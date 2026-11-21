@@ -79,14 +79,6 @@ fun IncomeScreen(
 
     val accounts = categoriesAccount?.optJSONArray("accounts")
 
-//    val formattedAmount = remember(amount) {
-//        if (amount.isBlank()) {
-//            "0"
-//        } else {
-//            NumberFormat.getNumberInstance(Locale("id", "ID"))
-//                .format(amount.toLongOrNull() ?: 0L)
-//        }
-//    }
 
     val formattedDate = remember(selectedDate) {
         SimpleDateFormat(
