@@ -49,8 +49,6 @@ class IncomeViewModel(
                 Log.d("IncomeVM", "Mulai request API")
                 val categoryAccount = incomeRepository.getCategoryAccount()
 
-                Log.d("IncomeVM", "Response: $categoryAccount")
-
                 _uiState.value = _uiState.value.copy(
                     categoryAccount = categoryAccount,
                     isLoading = false

@@ -12,8 +12,10 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AccountBalance
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.rounded.Category
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.Wallet
@@ -24,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
@@ -36,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myduitgw.ui.material.Theme
 import com.example.myduitgw.viewmodel.IncomeViewModel
+import org.json.JSONArray
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -50,6 +54,8 @@ fun IncomeScreen(
     onBack: () -> Unit,
     onSave: () -> Unit
 ){
+
+    val uiState by viewModel.uiState.collectAsState()
     LaunchedEffect(Unit) {
         viewModel.getIncomeData()
     }
@@ -66,21 +72,12 @@ fun IncomeScreen(
         mutableStateOf(false)
     }
 
-    val categories = listOf(
-        "Gaji",
-        "Bonus",
-        "Freelance",
-        "Bisnis",
-        "Investasi",
-        "Hadiah",
-        "Lainnya"
-    )
+    val categoriesAccount = uiState.categoryAccount?.optJSONObject("data")
+    Log.d("pppp", "$categoriesAccount")
 
-    val accounts = listOf(
-        "Mandiri",
-        "BRI",
-        "Cash"
-    )
+    val categories = categoriesAccount?.optJSONArray("categories")
+
+    val accounts = categoriesAccount?.optJSONArray("accounts")
 
 //    val formattedAmount = remember(amount) {
 //        if (amount.isBlank()) {
@@ -303,15 +300,16 @@ fun IncomeScreen(
                         color = Color.Black
                     )
 
-                    // CATEGORY
+
                     Column {
                         FieldLabel("Kategori")
 
                         DropdownField(
                             value = selectedCategory,
-                            placeholder = "Pilih kategori pemasukan",
+                            placeholder = "Pilih kategori",
                             options = categories,
-                            onSelected = { selectedCategory = it }
+                            onSelected = { selectedCategory = it },
+                            leadingIcon = Icons.Rounded.Category
                         )
                     }
 
@@ -323,7 +321,8 @@ fun IncomeScreen(
                             value = selectedAccount,
                             placeholder = "Pilih rekening",
                             options = accounts,
-                            onSelected = { selectedAccount = it }
+                            onSelected = { selectedAccount = it },
+                            leadingIcon = Icons.Rounded.AccountBalance
                         )
                     }
 
@@ -455,42 +454,48 @@ private fun FieldLabel(text: String) {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DropdownField(
+fun DropdownField(
     value: String,
     placeholder: String,
-    options: List<String>,
-    onSelected: (String) -> Unit
+    options: JSONArray?,
+    onSelected: (String) -> Unit,
+    leadingIcon: ImageVector? = null
 ) {
-    var expanded by remember {
-        mutableStateOf(false)
-    }
+    var expanded by remember { mutableStateOf(false) }
 
-    Box {
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(52.dp)
                 .background(
                     IncomeBackground,
                     RoundedCornerShape(12.dp)
                 )
-                .clickable {
-                    expanded = true
-                }
-                .padding(15.dp),
+                .menuAnchor()
+                .padding(horizontal = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Rounded.Wallet,
-                contentDescription = null,
-                tint = Theme
-            )
+            if (leadingIcon != null) {
+                Icon(
+                    imageVector = leadingIcon,
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier.size(20.dp)
+                )
 
-            Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(10.dp))
+            }
 
             Text(
-                text = value.ifBlank { placeholder },
-                color = if (value.isBlank()) Color.Gray else Color.Black,
+                text = value.ifEmpty { placeholder },
+                color = if (value.isEmpty()) Color.Gray else Color.Black,
                 fontSize = 14.sp,
                 modifier = Modifier.weight(1f)
             )
@@ -502,22 +507,34 @@ private fun DropdownField(
             )
         }
 
-        DropdownMenu(
+        ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = {
-                expanded = false
-            }
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(Color.White)
         ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = {
-                        Text(option)
-                    },
-                    onClick = {
-                        onSelected(option)
-                        expanded = false
-                    }
-                )
+            options?.let { array ->
+                for (i in 0 until array.length()) {
+                    val item = array.getJSONObject(i)
+                    val itemName = item.getString("name")
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = itemName,
+                                color = Color.Black,
+                                fontSize = 14.sp
+                            )
+                        },
+                        onClick = {
+                            onSelected(itemName)
+                            expanded = false
+                        },
+                        contentPadding = PaddingValues(
+                            horizontal = 16.dp,
+                            vertical = 8.dp
+                        )
+                    )
+                }
             }
         }
     }
