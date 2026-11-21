@@ -62,6 +62,8 @@ fun IncomeScreen(
     var amount by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("") }
     var selectedAccount by remember { mutableStateOf("") }
+    var selectedCategoryId by remember { mutableStateOf<Int?>(null) }
+    var selectedAccountId by remember { mutableStateOf<Int?>(null) }
     var note by remember { mutableStateOf("") }
 
     var selectedDate by remember {
@@ -300,7 +302,10 @@ fun IncomeScreen(
                             value = selectedCategory,
                             placeholder = "Pilih kategori",
                             options = categories,
-                            onSelected = { selectedCategory = it },
+                            onSelected = { name, id ->
+                                selectedCategory = name
+                                selectedCategoryId = id
+                            },
                             leadingIcon = Icons.Rounded.Category
                         )
                     }
@@ -313,7 +318,10 @@ fun IncomeScreen(
                             value = selectedAccount,
                             placeholder = "Pilih rekening",
                             options = accounts,
-                            onSelected = { selectedAccount = it },
+                            onSelected = { name, id ->
+                                selectedAccount = name
+                                selectedAccountId = id
+                            },
                             leadingIcon = Icons.Rounded.AccountBalance
                         )
                     }
@@ -452,7 +460,7 @@ fun DropdownField(
     value: String,
     placeholder: String,
     options: JSONArray?,
-    onSelected: (String) -> Unit,
+    onSelected: (String, Int) -> Unit,
     leadingIcon: ImageVector? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -508,6 +516,7 @@ fun DropdownField(
                 for (i in 0 until array.length()) {
                     val item = array.getJSONObject(i)
                     val itemName = item.getString("name")
+                    val itemId = item.getInt("id")
 
                     DropdownMenuItem(
                         text = {
@@ -518,7 +527,7 @@ fun DropdownField(
                             )
                         },
                         onClick = {
-                            onSelected(itemName)
+                            onSelected(itemName, itemId)
                             expanded = false
                         },
                         contentPadding = PaddingValues(
