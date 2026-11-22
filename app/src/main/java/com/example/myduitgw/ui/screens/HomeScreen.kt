@@ -1,6 +1,5 @@
 package com.example.myduitgw.ui.screens.home
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,16 +32,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myduitgw.data.repository.MockData
 import com.example.myduitgw.navigation.Routes
-import com.example.myduitgw.ui.components.DualLineChart
-import com.example.myduitgw.ui.components.FinanceCard
 import com.example.myduitgw.ui.components.ProfileAvatar
 import com.example.myduitgw.ui.components.TransactionItem
-import com.example.myduitgw.ui.material.FinanceColors
 import com.example.myduitgw.ui.material.Grey50
-import com.example.myduitgw.ui.material.Spacing
+import com.example.myduitgw.ui.theme.Spacing
 import com.example.myduitgw.ui.material.Theme
-import com.example.myduitgw.util.toCompactRupiah
-import com.example.myduitgw.util.toMonthYear
 import com.example.myduitgw.util.toRupiah
 import java.time.LocalDate
 import kotlinx.coroutines.launch
