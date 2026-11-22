@@ -1,7 +1,6 @@
-package com.example.myduitgw.ui.material
+package com.example.myduitgw.ui.theme
 
 import androidx.compose.ui.unit.dp
-
 object Spacing {
     val Small = 4.dp
     val Medium = 8.dp

@@ -24,26 +24,23 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.myduitgw.navigation.Routes
-import com.example.myduitgw.ui.material.Theme
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.runtime.*
-import androidx.compose.ui.draw.alpha
 import androidx.compose.material.icons.rounded.SwapHoriz
 import androidx.compose.material.icons.rounded.ArrowDownward
 import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.ui.text.font.FontWeight
-
+import com.example.myduitgw.ui.theme.Theme
 
 
 @Composable
 fun AppBottomBar(
     currentRoute: String?,
     onNavigateTab: (String) -> Unit,
-    onIncomeClick: () -> Unit
+    onIncomeClick: () -> Unit,
+    onExpenseClick: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -110,8 +107,9 @@ fun AppBottomBar(
                             onClick = {
                                 expanded = false
 
-                                if (item.third == "Income") {
-                                    onIncomeClick()
+                                when (item.third) {
+                                    "Income" -> onIncomeClick()
+                                    "Expense" -> onExpenseClick()
                                 }
                             },
                             modifier = Modifier.size(52.dp),

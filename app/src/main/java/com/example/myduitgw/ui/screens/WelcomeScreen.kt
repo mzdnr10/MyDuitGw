@@ -1,5 +1,4 @@
-
-package com.example.myduitgw.ui.auth
+package com.example.myduitgw.ui.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image

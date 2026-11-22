@@ -20,10 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myduitgw.data.model.SavingsGoal
-import com.example.myduitgw.ui.material.Grey50
-import com.example.myduitgw.ui.material.Radius
-import com.example.myduitgw.ui.material.Spacing
-import com.example.myduitgw.ui.material.Theme
+import com.example.myduitgw.ui.theme.Grey50
+import com.example.myduitgw.ui.theme.Radius
+import com.example.myduitgw.ui.theme.Spacing
+import com.example.myduitgw.ui.theme.Theme
 import com.example.myduitgw.util.toRupiah
 import kotlin.math.roundToInt
 

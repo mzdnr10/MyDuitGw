@@ -3,15 +3,15 @@ package com.example.myduitgw.data.repository
 import com.example.myduitgw.data.api.TransactionApi
 import org.json.JSONObject
 
-class IncomeRepository(
-    private val TransactionApi: TransactionApi
+class TransactionRepository(
+    private val transactionApi: TransactionApi
 ) {
-    suspend fun getCategoryAccount(): JSONObject {
-        return TransactionApi.getCategoryAccount()
+
+    suspend fun getCategoryAccount(type: String): JSONObject {
+        return transactionApi.getCategoryAccount(type)
     }
 
-    suspend fun createIncome(payload: JSONObject): JSONObject {
-        return TransactionApi.createIncome(payload)
+    suspend fun createTransaction(payload: JSONObject): JSONObject {
+        return transactionApi.createTransaction(payload)
     }
-
 }

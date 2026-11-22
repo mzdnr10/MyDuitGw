@@ -34,17 +34,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myduitgw.data.model.Transaction
 import com.example.myduitgw.data.model.TransactionType
-import com.example.myduitgw.ui.material.FinanceColors
-import com.example.myduitgw.ui.material.Grey50
-import com.example.myduitgw.ui.material.Radius
-import com.example.myduitgw.ui.material.Spacing
-import com.example.myduitgw.ui.material.Theme
-import com.example.myduitgw.ui.material.white
-import com.example.myduitgw.ui.material.black
+import com.example.myduitgw.ui.theme.FinanceColors
+import com.example.myduitgw.ui.theme.Radius
+import com.example.myduitgw.ui.theme.Spacing
 import com.example.myduitgw.util.toDisplayDate
 import com.example.myduitgw.util.toSignedRupiah
 import com.example.myduitgw.data.model.Category
-import com.example.myduitgw.ui.material.Grey800
+import com.example.myduitgw.ui.theme.Grey50
+import com.example.myduitgw.ui.theme.Theme
+import com.example.myduitgw.ui.theme.black
+import com.example.myduitgw.ui.theme.white
 
 @Composable
 fun ProfileAvatar(
@@ -63,112 +62,6 @@ fun ProfileAvatar(
             color = white,
             fontSize = (size.value * 0.4f).sp,
             fontWeight = FontWeight.SemiBold
-        )
-    }
-}
-
-@Composable
-fun SectionHeader(
-    title: String,
-    actionText: String? = null,
-    onAction: (() -> Unit)? = null
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = title,
-            color = Color.Black,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-        if (actionText != null && onAction != null) {
-            Text(
-                text = actionText,
-                color = Theme,
-                fontSize = 12.sp,
-                modifier = Modifier.clickable(onClick = onAction)
-            )
-        }
-    }
-}
-
-@Composable
-fun FinanceCard(
-    modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    val shape = RoundedCornerShape(Radius.Large)
-    if (onClick != null) {
-        Surface(
-            modifier = modifier.fillMaxWidth(),
-            shape = shape,
-            color = white,
-            shadowElevation = 4.dp,
-            onClick = onClick,
-            content = { Column(Modifier.padding(Spacing.Normal), content = content) }
-        )
-    } else {
-        Surface(
-            modifier = modifier.fillMaxWidth(),
-            shape = shape,
-            color = white,
-            shadowElevation = 4.dp,
-            content = { Column(Modifier.padding(Spacing.Normal), content = content) }
-        )
-    }
-}
-
-@Composable
-fun QuickActionButton(
-    icon: ImageVector,
-    label: String,
-    onClick: () -> Unit
-) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Surface(
-            modifier = Modifier.size(40.dp),
-            shape = CircleShape,
-            color = Grey50,
-            onClick = onClick
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = label,
-                    modifier = Modifier.size(22.dp),
-                    tint = Theme
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(Spacing.Small))
-        Text(
-            text = label,
-            color = Color.Gray,
-            fontSize = 10.sp
-        )
-    }
-}
-
-@Composable
-fun AppFilterChip(
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    Surface(
-        shape = RoundedCornerShape(20.dp),
-        color = if (selected) Theme else Grey50,
-        onClick = onClick
-    ) {
-        Text(
-            text = label,
-            color = if (selected) white else Color.DarkGray,
-            fontSize = 12.sp,
-            modifier = Modifier.padding(horizontal = Spacing.Normal, vertical = Spacing.Medium)
         )
     }
 }

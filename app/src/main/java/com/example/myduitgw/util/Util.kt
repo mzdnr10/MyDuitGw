@@ -39,13 +39,3 @@ fun Long.toSignedRupiah(type: TransactionType): String {
 
 fun LocalDate.toDisplayDate(): String = format(dateFormatter)
 
-fun LocalDate.toMonthYear(): String = format(monthFormatter)
-
-fun LocalDate.toGroupLabel(): String {
-    val today = LocalDate.now()
-    return when (this) {
-        today -> "Hari Ini"
-        today.minusDays(1) -> "Kemarin"
-        else -> format(monthFormatter).replaceFirstChar { it.titlecase(indonesianLocale) }
-    }
-}

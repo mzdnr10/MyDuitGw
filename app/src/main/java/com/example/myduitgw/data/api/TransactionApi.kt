@@ -7,30 +7,32 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
-
-class IncomeApi(
+class TransactionApi(
     private val sessionManager: SessionManager
 ) {
+
     companion object {
         private const val CATEGORYACCOUNT =
             "https://myduitgue-backend.ethiodeploy.app/api/services/category-account"
 
         private const val TRANSACTION =
             "https://myduitgue-backend.ethiodeploy.app/api/transaction/store"
-
     }
 
-    suspend fun getCategoryAccount(): JSONObject {
-        return request(CATEGORYACCOUNT)
+    suspend fun getCategoryAccount(type: String): JSONObject {
+        val payload = JSONObject().apply {
+            put("type", type)
+        }
+
+        return requestPost(CATEGORYACCOUNT, payload)
     }
 
-    suspend fun createIncome(payload: JSONObject): JSONObject {
+    suspend fun createTransaction(payload: JSONObject): JSONObject {
         return requestPost(TRANSACTION, payload)
     }
 
     private suspend fun request(endpoint: String): JSONObject =
         withContext(Dispatchers.IO) {
-
             val token = sessionManager.getToken()
                 ?: throw Exception("Session tidak ditemukan")
 
@@ -42,11 +44,10 @@ class IncomeApi(
                 connection.connectTimeout = 15000
                 connection.readTimeout = 15000
 
+                connection.setRequestProperty("Accept", "application/json")
                 connection.setRequestProperty(
-                    "Accept", "application/json"
-                )
-                connection.setRequestProperty(
-                    "Authorization", "Bearer $token"
+                    "Authorization",
+                    "Bearer $token"
                 )
 
                 val status = connection.responseCode
@@ -81,11 +82,11 @@ class IncomeApi(
         endpoint: String,
         payload: JSONObject
     ): JSONObject = withContext(Dispatchers.IO) {
-
         val token = sessionManager.getToken()
             ?: throw Exception("Session tidak ditemukan")
 
-        val connection = URL(endpoint).openConnection() as HttpURLConnection
+        val connection =
+            URL(endpoint).openConnection() as HttpURLConnection
 
         try {
             connection.requestMethod = "POST"
@@ -95,7 +96,10 @@ class IncomeApi(
 
             connection.setRequestProperty("Accept", "application/json")
             connection.setRequestProperty("Content-Type", "application/json")
-            connection.setRequestProperty("Authorization", "Bearer $token")
+            connection.setRequestProperty(
+                "Authorization",
+                "Bearer $token"
+            )
 
             connection.outputStream.bufferedWriter().use {
                 it.write(payload.toString())

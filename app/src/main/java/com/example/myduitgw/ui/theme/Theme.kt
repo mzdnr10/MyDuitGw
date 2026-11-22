@@ -5,17 +5,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import com.example.myduitgw.ui.material.Grey50
-import com.example.myduitgw.ui.material.Theme as AppPrimary
 
 private val DarkColorScheme = darkColorScheme(
-    primary = AppPrimary,
+    primary = Theme,
     secondary = PurpleGrey80,
     tertiary = Pink80
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = AppPrimary,
+    primary = Theme,
     secondary = PurpleGrey40,
     tertiary = Pink40,
     background = Grey50,

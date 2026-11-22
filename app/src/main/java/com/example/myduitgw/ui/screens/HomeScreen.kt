@@ -1,4 +1,4 @@
-package com.example.myduitgw.ui.screens.home
+package com.example.myduitgw.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,9 +34,7 @@ import com.example.myduitgw.data.repository.MockData
 import com.example.myduitgw.navigation.Routes
 import com.example.myduitgw.ui.components.ProfileAvatar
 import com.example.myduitgw.ui.components.TransactionItem
-import com.example.myduitgw.ui.material.Grey50
 import com.example.myduitgw.ui.theme.Spacing
-import com.example.myduitgw.ui.material.Theme
 import com.example.myduitgw.util.toRupiah
 import java.time.LocalDate
 import kotlinx.coroutines.launch
@@ -60,7 +58,6 @@ import com.example.myduitgw.data.model.Transaction
 import com.example.myduitgw.data.model.TransactionType
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import com.example.myduitgw.ui.material.Grey200
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
@@ -73,6 +70,11 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.myduitgw.data.model.DailyExpense
+import com.example.myduitgw.ui.theme.Grey200
+import com.example.myduitgw.ui.theme.Grey50
+import com.example.myduitgw.ui.theme.Theme
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun HomeScreen(
@@ -362,7 +364,7 @@ fun HomeScreen(
 
                 } else {
 
-                    val today = java.time.LocalDate.now()
+                    val today = LocalDate.now()
                     val dayNames = listOf("Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min")
 
                     for (i in 6 downTo 0) {
@@ -669,8 +671,8 @@ fun WeeklyExpenseCard(
         .coerceAtLeast(1L)
 
     val currencyFormat = remember {
-        java.text.NumberFormat.getCurrencyInstance(
-            java.util.Locale("id", "ID")
+        NumberFormat.getCurrencyInstance(
+            Locale("id", "ID")
         ).apply {
             maximumFractionDigits = 0
         }

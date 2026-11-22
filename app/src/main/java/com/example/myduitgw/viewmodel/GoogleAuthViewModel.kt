@@ -9,8 +9,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 import android.content.Context
-import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.example.myduitgw.data.repository.SessionManager
 
 data class GoogleAuthUiState(

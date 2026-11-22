@@ -2,6 +2,7 @@ package com.example.myduitgw.navigation
 import com.example.myduitgw.ui.components.AppBottomBar
 import android.app.Activity
 import android.content.ContextWrapper
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.padding
@@ -20,19 +21,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.myduitgw.auth.GoogleAuthManager
-import com.example.myduitgw.data.repository.FinanceStore
-import com.example.myduitgw.ui.auth.WelcomeScreen
-import com.example.myduitgw.ui.screens.home.HomeScreen
-import com.example.myduitgw.ui.screens.splash.SplashScreen
+import com.example.myduitgw.ui.screens.WelcomeScreen
+import com.example.myduitgw.ui.screens.HomeScreen
+import com.example.myduitgw.ui.screens.SplashScreen
 import com.example.myduitgw.viewmodel.GoogleAuthViewModel
 import kotlinx.coroutines.launch
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,18 +46,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.ui.unit.dp
-import com.example.myduitgw.ui.material.Theme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.Modifier
-import com.example.myduitgw.ui.transaction.IncomeScreen
-import com.example.myduitgw.viewmodel.IncomeViewModel
-
+import com.example.myduitgw.ui.theme.Theme
+import com.example.myduitgw.ui.transaction.TransactionFormScreen
+import com.example.myduitgw.ui.transaction.TransactionType
+import com.example.myduitgw.viewmodel.TransactionViewModel
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
     val context = LocalContext.current
     var splashFinished by remember { mutableStateOf(false) }
+
     val authViewModel: GoogleAuthViewModel = viewModel(
         factory = viewModelFactory {
             initializer {
@@ -81,19 +79,19 @@ fun AppNavigation() {
         }
     )
 
-    val incomeViewModel: IncomeViewModel = viewModel(
+    val transactionViewModel: TransactionViewModel = viewModel(
         factory = viewModelFactory {
             initializer {
-                IncomeViewModel(
+                TransactionViewModel(
                     context = context.applicationContext
                 )
             }
         }
     )
-    
+
     val authUiState by authViewModel.uiState.collectAsState()
     val homeUiState by homeViewModel.uiState.collectAsState()
-    val incomeUiState by incomeViewModel.uiState.collectAsState()
+    val transactionUiState by transactionViewModel.uiState.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -101,24 +99,23 @@ fun AppNavigation() {
 
     val scope = rememberCoroutineScope()
 
-
     LaunchedEffect(authUiState.message) {
         val message = authUiState.message ?: return@LaunchedEffect
+
         Toast.makeText(
             context,
             message,
             if (authUiState.isError) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
         ).show()
+
         authViewModel.clearMessage()
     }
 
     LaunchedEffect(homeUiState.isLoggedOut) {
         if (homeUiState.isLoggedOut) {
 
-            // Update status autentikasi
             authViewModel.onLogout()
 
-            // Navigasi ke Welcome
             navController.navigate(Routes.WELCOME) {
                 popUpTo(Routes.HOME) {
                     inclusive = true
@@ -172,13 +169,13 @@ fun AppNavigation() {
         authViewModel.checkSession()
     }
 
-
-
     val activity = remember(context) {
         var current = context
+
         while (current !is Activity && current is ContextWrapper) {
             current = current.baseContext
         }
+
         current as? Activity
     }
 
@@ -189,7 +186,7 @@ fun AppNavigation() {
     Scaffold(
         bottomBar = {
             AnimatedVisibility(
-                visible = currentRoute in Routes.bottomBarRoutes,
+                visible = showBottomBar,
             ) {
                 if (showBottomBar) {
                     AppBottomBar(
@@ -198,7 +195,6 @@ fun AppNavigation() {
 
                             if (route == currentRoute) {
 
-                                // Kalau sedang di Home, refresh data saja
                                 if (route == Routes.HOME) {
                                     homeViewModel.getHomeData()
                                 }
@@ -216,12 +212,16 @@ fun AppNavigation() {
                         },
                         onIncomeClick = {
                             navController.navigate(Routes.INCOME)
+                        },
+                        onExpenseClick = {
+                            navController.navigate(Routes.EXPENSE)
                         }
                     )
                 }
             }
         }
     ) { innerPadding ->
+
         NavHost(
             navController = navController,
             startDestination = Routes.SPLASH,
@@ -263,9 +263,8 @@ fun AppNavigation() {
                 )
             }
         ) {
-            composable(
-                Routes.SPLASH,
-            ) {
+
+            composable(Routes.SPLASH) {
                 SplashScreen(
                     playLogoAnimation = !authUiState.isAuthenticated,
                     onFinished = {
@@ -274,9 +273,7 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
-                Routes.WELCOME
-                ) {
+            composable(Routes.WELCOME) {
                 WelcomeScreen(
                     isLoading = authUiState.isLoading,
                     onGoogleSignIn = {
@@ -291,11 +288,12 @@ fun AppNavigation() {
                                 authViewModel.loginWithGoogle(idToken)
 
                             } catch (exception: Exception) {
-                                android.util.Log.e(
+                                Log.e(
                                     "GoogleAuth",
                                     "Sign-in failed",
                                     exception
                                 )
+
                                 Toast.makeText(
                                     context,
                                     "${exception.javaClass.name}: ${exception.message}",
@@ -307,9 +305,7 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
-                Routes.HOME,
-            ) {
+            composable(Routes.HOME) {
                 HomeScreen(
                     viewModel = homeViewModel,
                     onNavigate = { route ->
@@ -330,19 +326,30 @@ fun AppNavigation() {
                     }
                 )
             }
-            composable(Routes.INCOME) {
-                IncomeScreen(
 
-                    viewModel = incomeViewModel,
+            composable(Routes.INCOME) {
+                TransactionFormScreen(
+                    type = TransactionType.INCOME,
+                    viewModel = transactionViewModel,
                     onBack = {
                         navController.popBackStack()
-                    },
+                    }
+                )
+            }
+
+            composable(Routes.EXPENSE) {
+                TransactionFormScreen(
+                    type = TransactionType.EXPENSE,
+                    viewModel = transactionViewModel,
+                    onBack = {
+                        navController.popBackStack()
+                    }
                 )
             }
         }
     }
 
-    if (homeUiState.isLoading || incomeUiState.isLoading ) {
+    if (homeUiState.isLoading || transactionUiState.isLoading) {
         Box(
             modifier = Modifier
                 .fillMaxSize()

@@ -1,5 +1,4 @@
-
-package com.example.myduitgw.ui.screens.splash
+package com.example.myduitgw.ui.screens
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -28,13 +27,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myduitgw.R
-import com.example.myduitgw.ui.material.Grey600
-import com.example.myduitgw.ui.material.Theme
-import com.example.myduitgw.ui.material.white
 import kotlinx.coroutines.delay
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.layout.offset
+import com.example.myduitgw.ui.theme.Grey600
+import com.example.myduitgw.ui.theme.Theme
+import com.example.myduitgw.ui.theme.white
 
 @Composable
 fun SplashScreen(
