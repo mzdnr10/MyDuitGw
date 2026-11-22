@@ -11,4 +11,8 @@ class IncomeRepository(
         return IncomeApi.getCategoryAccount()
     }
 
+    suspend fun createIncome(payload: JSONObject): JSONObject {
+        return IncomeApi.createIncome(payload)
+    }
+
 }

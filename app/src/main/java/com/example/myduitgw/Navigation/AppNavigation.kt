@@ -142,7 +142,7 @@ fun AppNavigation() {
                     !authUiState.isCheckingSession -> {
 
                 val destination = if (authUiState.isAuthenticated) {
-                    Routes.INCOME
+                    Routes.HOME
                 } else {
                     Routes.WELCOME
                 }
@@ -337,9 +337,6 @@ fun AppNavigation() {
                     onBack = {
                         navController.popBackStack()
                     },
-                    onSave = {
-                        // Nanti kita sambungkan ke proses simpan transaksi
-                    }
                 )
             }
         }

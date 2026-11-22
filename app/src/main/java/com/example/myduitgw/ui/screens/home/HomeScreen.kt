@@ -407,7 +407,7 @@ fun HomeScreen(
                         add(
                             Transaction(
                                 id = item.optString("id"),
-                                title = item.optString("title"),
+                                title = item.optJSONObject("category")?.optString("name") ?: "Unknown",
                                 amount = item.optString("amount")
                                     .toDoubleOrNull()?.toLong() ?: 0L,
                                 type = if (item.optString("type") == "income") {

@@ -68,4 +68,44 @@ class IncomeViewModel(
             }
         }
     }
+
+    fun createIncome(payload: JSONObject) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                message = null,
+                isError = false
+            )
+
+            try {
+
+                val response = incomeRepository.createIncome(payload)
+
+                _uiState.value = _uiState.value.copy(
+                    message = response.optString(
+                        "message",
+                        "Transaksi berhasil disimpan"
+                    ),
+                    isLoading = false,
+                    isError = false
+                )
+
+            } catch (exception: CancellationException) {
+                throw exception
+
+            } catch (exception: Exception) {
+                Log.e(
+                    "IncomeVM",
+                    "Error create income: ${exception.message}",
+                    exception
+                )
+
+                _uiState.value = _uiState.value.copy(
+                    message = exception.message,
+                    isLoading = false,
+                    isError = true
+                )
+            }
+        }
+    }
 }

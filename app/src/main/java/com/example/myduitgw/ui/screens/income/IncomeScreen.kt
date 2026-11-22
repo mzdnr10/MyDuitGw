@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import com.example.myduitgw.ui.material.Theme
 import com.example.myduitgw.viewmodel.IncomeViewModel
 import org.json.JSONArray
+import org.json.JSONObject
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -52,7 +53,6 @@ private val IncomeBackground = Color(0xFFF5F6F8)
 fun IncomeScreen(
     viewModel: IncomeViewModel,
     onBack: () -> Unit,
-    onSave: () -> Unit
 ){
 
     val uiState by viewModel.uiState.collectAsState()
@@ -64,7 +64,7 @@ fun IncomeScreen(
     var selectedAccount by remember { mutableStateOf("") }
     var selectedCategoryId by remember { mutableStateOf<Int?>(null) }
     var selectedAccountId by remember { mutableStateOf<Int?>(null) }
-    var note by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
 
     var selectedDate by remember {
         mutableStateOf(System.currentTimeMillis())
@@ -93,7 +93,9 @@ fun IncomeScreen(
             amount.toLongOrNull() != null &&
             amount.toLongOrNull()!! > 0 &&
             selectedCategory.isNotBlank() &&
-            selectedAccount.isNotBlank()
+            selectedAccount.isNotBlank() &&
+            selectedCategoryId != null &&
+            selectedAccountId != null
 
     var isAmountFocused by remember { mutableStateOf(false) }
     var hasAmountInteracted by remember { mutableStateOf(false) }
@@ -364,8 +366,8 @@ fun IncomeScreen(
                         FieldLabel("Catatan (Opsional)")
 
                         OutlinedTextField(
-                            value = note,
-                            onValueChange = { note = it },
+                            value = description,
+                            onValueChange = { description = it },
                             placeholder = {
                                 Text("Tambahkan catatan")
                             },
@@ -385,7 +387,23 @@ fun IncomeScreen(
 
         // SAVE BUTTON
         Button(
-            onClick = onSave,
+            onClick = {
+                val payload = JSONObject().apply {
+                    put("category_id", selectedCategoryId)
+                    put("amount", amount.toLong())
+                    put("type", "income")
+                    put("description", description)
+                    put(
+                        "transaction_date",
+                        SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            .format(Date(selectedDate))
+                    )
+                    put("account_id", selectedAccountId)
+                }
+
+                onBack()
+                viewModel.createIncome(payload)
+            },
             enabled = isFormValid,
             modifier = Modifier
                 .fillMaxWidth()
