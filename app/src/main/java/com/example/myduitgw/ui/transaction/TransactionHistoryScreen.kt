@@ -1,5 +1,6 @@
 package com.example.myduitgw.ui.transaction
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,21 +22,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myduitgw.data.model.Transaction
+import com.example.myduitgw.ui.components.TransactionItem
 import com.example.myduitgw.ui.theme.FinanceColors
 import com.example.myduitgw.ui.theme.Grey50
 import com.example.myduitgw.ui.theme.Theme
 import com.example.myduitgw.util.toDisplayDate
 import com.example.myduitgw.util.toSignedRupiah
+import com.example.myduitgw.viewmodel.TransactionHistoryViewModel
+import com.example.myduitgw.viewmodel.TransactionViewModel
+import java.time.LocalDate
 
-data class HistoryTransactionUiModel(
-    val id: Int,
-    val categoryName: String,
-    val accountName: String,
-    val description: String?,
-    val amount: Long,
-    val type: String,
-    val transactionDate: String
-)
 
 private val HistoryBackground = Grey50
 private val HistoryBlue = Theme
@@ -44,30 +41,67 @@ private val ExpenseRed = FinanceColors.Expense
 
 @Composable
 fun TransactionHistoryScreen(
-    transactions: List<HistoryTransactionUiModel>,
-    onTransactionClick: (HistoryTransactionUiModel) -> Unit = {}
+    viewModel: TransactionHistoryViewModel,
 ) {
+
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.getTransactionHistory()
+    }
+
+    val transactionsJson = uiState.transactionHistory
+        ?.optJSONObject("data")
+        ?.optJSONArray("transactions")
+
     var selectedFilter by remember { mutableStateOf("All") }
     var searchQuery by remember { mutableStateOf("") }
 
+    val transactions = buildList {
+
+        if (transactionsJson != null) {
+            for (i in 0 until transactionsJson.length()) {
+                val item = transactionsJson.optJSONObject(i) ?: continue
+
+                add(
+                    Transaction(
+                        id = item.optString("id"),
+                        title = item.optJSONObject("category")
+                            ?.optString("name") ?: "Unknown",
+                        amount = item.optString("amount")
+                            .toDoubleOrNull()?.toLong() ?: 0L,
+                        type = if (item.optString("type") == "income") {
+                            TransactionType.INCOME
+                        } else {
+                            TransactionType.EXPENSE
+                        },
+                        category = item.optJSONObject("category")
+                            ?.optString("name"),
+                        date = LocalDate.parse(
+                            item.optString("transaction_date")
+                        ),
+                        description = item.optString("description")
+                    )
+                )
+            }
+        }
+    }
+
     val filteredTransactions = transactions.filter { transaction ->
+
+        val matchesSearch =
+            transaction.title.contains(searchQuery, ignoreCase = true) ||
+                    transaction.description.orEmpty()
+                        .contains(searchQuery, ignoreCase = true)
+
         val matchesFilter = when (selectedFilter) {
-            "Income" -> transaction.type.equals("income", true)
-            "Expense" -> transaction.type.equals("expense", true)
+            "Income" -> transaction.type == TransactionType.INCOME
+            "Expense" -> transaction.type == TransactionType.EXPENSE
             else -> true
         }
 
-        val matchesSearch =
-            transaction.categoryName.contains(searchQuery, ignoreCase = true) ||
-                    transaction.accountName.contains(searchQuery, ignoreCase = true) ||
-                    transaction.description.orEmpty().contains(searchQuery, ignoreCase = true)
-
-        matchesFilter && matchesSearch
+        matchesSearch && matchesFilter
     }
-
-    val groupedTransactions = filteredTransactions.groupBy {
-        it.transactionDate.take(10)
-    }.toSortedMap(compareByDescending { it })
 
     Column(
         modifier = Modifier
@@ -75,8 +109,10 @@ fun TransactionHistoryScreen(
             .background(HistoryBackground)
             .padding(horizontal = 20.dp)
     ) {
+
         Spacer(modifier = Modifier.height(20.dp))
 
+        // Header
         Text(
             text = "Transactions",
             fontSize = 24.sp,
@@ -92,6 +128,7 @@ fun TransactionHistoryScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        // Search
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(14.dp),
@@ -134,6 +171,7 @@ fun TransactionHistoryScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Filter
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -165,188 +203,144 @@ fun TransactionHistoryScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        if (filteredTransactions.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AccountBalanceWallet,
-                        contentDescription = null,
-                        modifier = Modifier.size(54.dp),
-                        tint = Color(0xFFB0B7C3)
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = "No transactions found",
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF374151)
-                    )
-
-                    Text(
-                        text = "Your transactions will appear here",
-                        fontSize = 13.sp,
-                        color = Color(0xFF9CA3AF)
-                    )
-                }
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(bottom = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                groupedTransactions.forEach { (date, items) ->
-                    item(key = "date_$date") {
-                        Text(
-                            text = date.toDisplayDate(),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF374151),
-                            modifier = Modifier.padding(
-                                top = 8.dp,
-                                bottom = 2.dp
-                            )
-                        )
-                    }
-
-                    items(
-                        items = items,
-                        key = { it.id }
-                    ) { transaction ->
-                        TransactionHistoryItem(
-                            transaction = transaction,
-                            onClick = {
-                                onTransactionClick(transaction)
-                            }
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun TransactionHistoryItem(
-    transaction: HistoryTransactionUiModel,
-    onClick: () -> Unit
-) {
-    val isIncome = transaction.type.equals("income", true)
-
-    val type = if (isIncome) {
-        TransactionType.INCOME
-    } else {
-        TransactionType.EXPENSE
-    }
-
-    val amountColor = if (isIncome) IncomeGreen else ExpenseRed
-
-    val icon = when (transaction.categoryName.lowercase()) {
-        "food", "makanan", "food & beverage" ->
-            Icons.Default.Restaurant
-
-        "shopping", "belanja" ->
-            Icons.Default.ShoppingBag
-
-        "transport", "transportasi" ->
-            Icons.Default.DirectionsCar
-
-        else ->
-            Icons.Default.Payments
-    }
-
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
-        color = Color.White
-    ) {
-        Row(
-            modifier = Modifier.padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically
+        // Transaction list
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(46.dp)
-                    .background(
-                        color = if (isIncome) Color(0xFFE8F7EE)
-                        else Color(0xFFF1F3F5),
-                        shape = RoundedCornerShape(13.dp)
-                    ),
-                contentAlignment = Alignment.Center
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = transaction.categoryName,
-                    tint = if (isIncome) IncomeGreen
-                    else Color(0xFF6B7280)
-                )
-            }
+                items(filteredTransactions) { transaction ->
 
-            Spacer(modifier = Modifier.width(12.dp))
 
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = transaction.categoryName,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF1F2937),
-                    maxLines = 1
-                )
-
-                Text(
-                    text = transaction.description
-                        ?.takeIf { it.isNotBlank() }
-                        ?: transaction.accountName,
-                    fontSize = 12.sp,
-                    color = Color(0xFF9CA3AF),
-                    maxLines = 1
-                )
-
-                if (!transaction.description.isNullOrBlank()) {
-                    Text(
-                        text = transaction.accountName,
-                        fontSize = 11.sp,
-                        color = Color(0xFF9CA3AF),
-                        maxLines = 1
-                    )
+                    TransactionItem(transaction = transaction)
                 }
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = transaction.amount.toSignedRupiah(type),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = amountColor
-                )
-
-                Text(
-                    text = transaction.transactionDate
-                        .takeIf { it.length >= 10 }
-                        ?.substring(0, 10)
-                        ?.toDisplayDate()
-                        ?: transaction.transactionDate,
-                    fontSize = 11.sp,
-                    color = Color(0xFF9CA3AF)
-                )
             }
         }
     }
 }
+
+//
+//@Composable
+//private fun TransactionHistoryItem(
+//    categoryName: String,
+//    type: String,
+//    amount: Long,
+//    description: String?,
+//    accountName: String,
+//    transactionDate: String,
+//    onClick: () -> Unit = {}
+//) {
+//    val isIncome = type.equals("income", true)
+//
+//    val transactionType = if (isIncome) {
+//        TransactionType.INCOME
+//    } else {
+//        TransactionType.EXPENSE
+//    }
+//
+//    val amountColor = if (isIncome) IncomeGreen else ExpenseRed
+//
+//    val icon = when (categoryName.lowercase()) {
+//        "food", "makanan", "food & beverage" ->
+//            Icons.Default.Restaurant
+//
+//        "shopping", "belanja" ->
+//            Icons.Default.ShoppingBag
+//
+//        "transport", "transportasi" ->
+//            Icons.Default.DirectionsCar
+//
+//        else ->
+//            Icons.Default.Payments
+//    }
+//
+//    Surface(
+//        modifier = Modifier.fillMaxWidth(),
+//        onClick = onClick,
+//        shape = RoundedCornerShape(16.dp),
+//        color = Color.White
+//    ) {
+//        Row(
+//            modifier = Modifier.padding(14.dp),
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            Box(
+//                modifier = Modifier
+//                    .size(46.dp)
+//                    .background(
+//                        color = if (isIncome) Color(0xFFE8F7EE)
+//                        else Color(0xFFF1F3F5),
+//                        shape = RoundedCornerShape(13.dp)
+//                    ),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Icon(
+//                    imageVector = icon,
+//                    contentDescription = categoryName,
+//                    tint = if (isIncome) IncomeGreen
+//                    else Color(0xFF6B7280)
+//                )
+//            }
+//
+//            Spacer(modifier = Modifier.width(12.dp))
+//
+//            Column(
+//                modifier = Modifier.weight(1f),
+//                verticalArrangement = Arrangement.spacedBy(4.dp)
+//            ) {
+//                Text(
+//                    text = categoryName,
+//                    fontSize = 14.sp,
+//                    fontWeight = FontWeight.SemiBold,
+//                    color = Color(0xFF1F2937),
+//                    maxLines = 1
+//                )
+//
+//                Text(
+//                    text = description
+//                        ?.takeIf { it.isNotBlank() }
+//                        ?: accountName,
+//                    fontSize = 12.sp,
+//                    color = Color(0xFF9CA3AF),
+//                    maxLines = 1
+//                )
+//
+//                if (!description.isNullOrBlank()) {
+//                    Text(
+//                        text = accountName,
+//                        fontSize = 11.sp,
+//                        color = Color(0xFF9CA3AF),
+//                        maxLines = 1
+//                    )
+//                }
+//            }
+//
+//            Spacer(modifier = Modifier.width(8.dp))
+//
+//            Column(
+//                horizontalAlignment = Alignment.End,
+//                verticalArrangement = Arrangement.spacedBy(4.dp)
+//            ) {
+//                Text(
+//                    text = amount.toSignedRupiah(transactionType),
+//                    fontSize = 13.sp,
+//                    fontWeight = FontWeight.Bold,
+//                    color = amountColor
+//                )
+//
+//                Text(
+//                    text = transactionDate
+//                        .takeIf { it.length >= 10 }
+//                        ?.substring(0, 10)
+//                        ?.toDisplayDate()
+//                        ?: transactionDate,
+//                    fontSize = 11.sp,
+//                    color = Color(0xFF9CA3AF)
+//                )
+//            }
+//        }
+//    }
+//}

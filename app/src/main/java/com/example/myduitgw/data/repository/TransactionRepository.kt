@@ -14,4 +14,7 @@ class TransactionRepository(
     suspend fun createTransaction(payload: JSONObject): JSONObject {
         return transactionApi.createTransaction(payload)
     }
+    suspend fun getTransactionHistory(payload: JSONObject): JSONObject {
+        return transactionApi.getTransactionHistory(payload)
+    }
 }

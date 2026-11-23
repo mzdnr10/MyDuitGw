@@ -82,8 +82,6 @@ fun TransactionItem(
         Category.OTHER_EXPENSE
     }
 
-    Log.d("DEBUG_CATEGORY", "Category: $category")
-
     Row(
         modifier = Modifier
             .fillMaxWidth()

@@ -53,7 +53,6 @@ class TransactionViewModel(
                     isLoading = false
                 )
 
-                Log.d("ppppppp", categoryAccount.toString())
 
             } catch (exception: CancellationException) {
                 throw exception

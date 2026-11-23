@@ -498,8 +498,6 @@ fun HomeScreen(
                     if (filteredTransactions.isNotEmpty()) {
 
                         filteredTransactions.take(5).forEach { transaction ->
-
-                            Log.d("apake", filteredTransactions.toString())
                             TransactionItem(
                                 transaction = transaction
                             )

@@ -17,6 +17,9 @@ class TransactionApi(
 
         private const val TRANSACTION =
             "https://myduitgue-backend.ethiodeploy.app/api/transaction/store"
+
+        private const val TRANSACTIONHISTORY =
+            "https://myduitgue-backend.ethiodeploy.app/api/transaction/history"
     }
 
     suspend fun getCategoryAccount(type: String): JSONObject {
@@ -31,52 +34,9 @@ class TransactionApi(
         return requestPost(TRANSACTION, payload)
     }
 
-    private suspend fun request(endpoint: String): JSONObject =
-        withContext(Dispatchers.IO) {
-            val token = sessionManager.getToken()
-                ?: throw Exception("Session tidak ditemukan")
-
-            val connection =
-                URL(endpoint).openConnection() as HttpURLConnection
-
-            try {
-                connection.requestMethod = "POST"
-                connection.connectTimeout = 15000
-                connection.readTimeout = 15000
-
-                connection.setRequestProperty("Accept", "application/json")
-                connection.setRequestProperty(
-                    "Authorization",
-                    "Bearer $token"
-                )
-
-                val status = connection.responseCode
-
-                if (status == 401) {
-                    sessionManager.clearSession()
-                    throw Exception("Session sudah berakhir")
-                }
-
-                val stream = if (status in 200..299) {
-                    connection.inputStream
-                } else {
-                    connection.errorStream
-                }
-
-                val responseText = stream.bufferedReader().use {
-                    it.readText()
-                }
-
-                if (status !in 200..299) {
-                    throw Exception("HTTP Error: $status - $responseText")
-                }
-
-                JSONObject(responseText)
-
-            } finally {
-                connection.disconnect()
-            }
-        }
+    suspend fun getTransactionHistory(payload: JSONObject): JSONObject {
+        return requestPost(TRANSACTIONHISTORY, payload)
+    }
 
     private suspend fun requestPost(
         endpoint: String,

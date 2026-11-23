@@ -53,6 +53,8 @@ import com.example.myduitgw.ui.theme.Theme
 import com.example.myduitgw.ui.transaction.TransactionFormScreen
 import com.example.myduitgw.ui.transaction.TransactionHistoryScreen
 import com.example.myduitgw.ui.transaction.TransactionType
+import com.example.myduitgw.viewmodel.TransactionHistoryUiState
+import com.example.myduitgw.viewmodel.TransactionHistoryViewModel
 import com.example.myduitgw.viewmodel.TransactionViewModel
 @Composable
 fun AppNavigation() {
@@ -90,9 +92,20 @@ fun AppNavigation() {
         }
     )
 
+    val transactionHistoryViewModel: TransactionHistoryViewModel = viewModel(
+        factory = viewModelFactory {
+            initializer {
+                TransactionHistoryViewModel(
+                    context = context.applicationContext
+                )
+            }
+        }
+    )
+
     val authUiState by authViewModel.uiState.collectAsState()
     val homeUiState by homeViewModel.uiState.collectAsState()
     val transactionUiState by transactionViewModel.uiState.collectAsState()
+    val transactionHistoryUiState by transactionHistoryViewModel.uiState.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -350,13 +363,13 @@ fun AppNavigation() {
 
             composable(Routes.TRANSACTIONSHISTORY) {
                 TransactionHistoryScreen(
-                    transactions = emptyList(),
+                    viewModel = transactionHistoryViewModel,
                 )
             }
         }
     }
 
-    if (homeUiState.isLoading || transactionUiState.isLoading) {
+    if (homeUiState.isLoading || transactionUiState.isLoading || transactionHistoryUiState.isLoading) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
