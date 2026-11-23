@@ -1,5 +1,6 @@
 package com.example.myduitgw.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,7 +31,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myduitgw.data.repository.MockData
 import com.example.myduitgw.navigation.Routes
 import com.example.myduitgw.ui.components.ProfileAvatar
 import com.example.myduitgw.ui.components.TransactionItem
@@ -55,7 +55,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.example.myduitgw.viewmodel.HomeViewModel
 import com.example.myduitgw.data.model.Transaction
-import com.example.myduitgw.data.model.TransactionType
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -73,6 +72,7 @@ import com.example.myduitgw.data.model.DailyExpense
 import com.example.myduitgw.ui.theme.Grey200
 import com.example.myduitgw.ui.theme.Grey50
 import com.example.myduitgw.ui.theme.Theme
+import com.example.myduitgw.ui.transaction.TransactionType
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -151,7 +151,7 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.height(2.dp))
 
                         Text(
-                            text = MockData.userSubtitle,
+                            text = "Welcome Back Again",
                             color = Color.Black.copy(alpha = 0.75f),
                             fontSize = 11.sp
                         )
@@ -411,7 +411,7 @@ fun HomeScreen(
                                 } else {
                                     TransactionType.EXPENSE
                                 },
-                                category = null,
+                                category = item.optJSONObject("category")?.optString("name"),
                                 date = LocalDate.parse(
                                     item.optString("transaction_date")
                                 ),
@@ -499,6 +499,7 @@ fun HomeScreen(
 
                         filteredTransactions.take(5).forEach { transaction ->
 
+                            Log.d("apake", filteredTransactions.toString())
                             TransactionItem(
                                 transaction = transaction
                             )

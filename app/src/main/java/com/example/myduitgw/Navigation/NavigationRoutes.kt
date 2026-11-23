@@ -9,6 +9,7 @@ object Routes {
     const val PROFILE = "profile"
     const val INCOME = "income"
     const val EXPENSE = "expense"
+    const val TRANSACTIONSHISTORY = "transactionhistory"
 
-    val bottomBarRoutes = setOf(HOME, TRANSACTIONS, SAVINGS, PROFILE)
+    val bottomBarRoutes = setOf(HOME, TRANSACTIONSHISTORY, SAVINGS, PROFILE)
 }

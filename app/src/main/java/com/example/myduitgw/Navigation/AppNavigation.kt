@@ -51,6 +51,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.Modifier
 import com.example.myduitgw.ui.theme.Theme
 import com.example.myduitgw.ui.transaction.TransactionFormScreen
+import com.example.myduitgw.ui.transaction.TransactionHistoryScreen
 import com.example.myduitgw.ui.transaction.TransactionType
 import com.example.myduitgw.viewmodel.TransactionViewModel
 @Composable
@@ -344,6 +345,12 @@ fun AppNavigation() {
                     onBack = {
                         navController.popBackStack()
                     }
+                )
+            }
+
+            composable(Routes.TRANSACTIONSHISTORY) {
+                TransactionHistoryScreen(
+                    transactions = emptyList(),
                 )
             }
         }

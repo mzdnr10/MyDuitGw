@@ -159,10 +159,10 @@ fun AppBottomBar(
                 BottomBarItem(
                     icon = Icons.AutoMirrored.Rounded.List,
                     label = "Transaksi",
-                    selected = currentRoute == Routes.TRANSACTIONS,
+                    selected = currentRoute == Routes.TRANSACTIONSHISTORY,
                     onClick = {
                         expanded = false
-                        onNavigateTab(Routes.TRANSACTIONS)
+                        onNavigateTab(Routes.TRANSACTIONSHISTORY)
                     }
                 )
 

@@ -1,5 +1,6 @@
 package com.example.myduitgw.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.MoreHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,7 +36,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myduitgw.data.model.Transaction
-import com.example.myduitgw.data.model.TransactionType
 import com.example.myduitgw.ui.theme.FinanceColors
 import com.example.myduitgw.ui.theme.Radius
 import com.example.myduitgw.ui.theme.Spacing
@@ -44,6 +46,7 @@ import com.example.myduitgw.ui.theme.Grey50
 import com.example.myduitgw.ui.theme.Theme
 import com.example.myduitgw.ui.theme.black
 import com.example.myduitgw.ui.theme.white
+import com.example.myduitgw.ui.transaction.TransactionType
 
 @Composable
 fun ProfileAvatar(
@@ -69,15 +72,18 @@ fun ProfileAvatar(
 @Composable
 fun TransactionItem(
     transaction: Transaction,
-    showDate: Boolean = true
+    showCategory: Boolean = false
 ) {
-    val category = transaction.category ?: if (
-        transaction.type == TransactionType.INCOME
-    ) {
+    val category = Category.entries.find {
+        it.label == transaction.category
+    } ?: if (transaction.type == TransactionType.INCOME) {
         Category.OTHER_INCOME
     } else {
         Category.OTHER_EXPENSE
     }
+
+    Log.d("DEBUG_CATEGORY", "Category: $category")
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -109,10 +115,10 @@ fun TransactionItem(
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = if (showDate) {
-                    "${category.label} • ${transaction.date.toDisplayDate()}"
+                text = if (showCategory) {
+                    "${category} • ${transaction.date.toDisplayDate()}"
                 } else {
-                    category.label
+                    "$category"
                 },
                 color = Color.Gray,
                 fontSize = 11.sp
