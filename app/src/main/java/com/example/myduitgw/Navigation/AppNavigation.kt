@@ -53,9 +53,12 @@ import com.example.myduitgw.ui.theme.Theme
 import com.example.myduitgw.ui.transaction.TransactionFormScreen
 import com.example.myduitgw.ui.transaction.TransactionHistoryScreen
 import com.example.myduitgw.ui.transaction.TransactionType
+import com.example.myduitgw.ui.transaction.TransferScreen
 import com.example.myduitgw.viewmodel.TransactionHistoryUiState
 import com.example.myduitgw.viewmodel.TransactionHistoryViewModel
 import com.example.myduitgw.viewmodel.TransactionViewModel
+import com.example.myduitgw.viewmodel.TransferViewModel
+
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
@@ -96,6 +99,16 @@ fun AppNavigation() {
         factory = viewModelFactory {
             initializer {
                 TransactionHistoryViewModel(
+                    context = context.applicationContext
+                )
+            }
+        }
+    )
+
+    val transferViewModel: TransferViewModel = viewModel(
+        factory = viewModelFactory {
+            initializer {
+                TransferViewModel(
                     context = context.applicationContext
                 )
             }
@@ -229,6 +242,9 @@ fun AppNavigation() {
                         },
                         onExpenseClick = {
                             navController.navigate(Routes.EXPENSE)
+                        },
+                        onTransferClick = {
+                            navController.navigate(Routes.TRANSFER)
                         }
                     )
                 }
@@ -364,6 +380,15 @@ fun AppNavigation() {
             composable(Routes.TRANSACTIONSHISTORY) {
                 TransactionHistoryScreen(
                     viewModel = transactionHistoryViewModel,
+                )
+            }
+
+            composable(Routes.TRANSFER) {
+                TransferScreen(
+                    viewModel = transferViewModel,
+                    onBack = {
+                        navController.popBackStack()
+                    }
                 )
             }
         }

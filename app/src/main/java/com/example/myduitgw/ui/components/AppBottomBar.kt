@@ -40,7 +40,8 @@ fun AppBottomBar(
     currentRoute: String?,
     onNavigateTab: (String) -> Unit,
     onIncomeClick: () -> Unit,
-    onExpenseClick: () -> Unit
+    onExpenseClick: () -> Unit,
+    onTransferClick: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -110,6 +111,7 @@ fun AppBottomBar(
                                 when (item.third) {
                                     "Income" -> onIncomeClick()
                                     "Expense" -> onExpenseClick()
+                                    "Transfer" -> onTransferClick()
                                 }
                             },
                             modifier = Modifier.size(52.dp),

@@ -10,6 +10,6 @@ object Routes {
     const val INCOME = "income"
     const val EXPENSE = "expense"
     const val TRANSACTIONSHISTORY = "transactionhistory"
-
+    const val TRANSFER = "transfer"
     val bottomBarRoutes = setOf(HOME, TRANSACTIONSHISTORY, SAVINGS, PROFILE)
 }

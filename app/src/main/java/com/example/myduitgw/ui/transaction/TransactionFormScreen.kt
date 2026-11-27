@@ -487,7 +487,7 @@ fun TransactionFormScreen(
 }
 
 @Composable
-private fun FieldLabel(text: String) {
+fun FieldLabel(text: String) {
     Text(
         text = text,
         fontSize = 12.sp,

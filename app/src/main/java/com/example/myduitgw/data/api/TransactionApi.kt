@@ -20,6 +20,9 @@ class TransactionApi(
 
         private const val TRANSACTIONHISTORY =
             "https://myduitgue-backend.ethiodeploy.app/api/transaction/history"
+
+        private const val TRANSFER =
+            "https://myduitgue-backend.ethiodeploy.app/api/transaction/transfer"
     }
 
     suspend fun getCategoryAccount(type: String): JSONObject {
@@ -35,6 +38,9 @@ class TransactionApi(
     }
 
     suspend fun getTransactionHistory(payload: JSONObject): JSONObject {
+        return requestPost(TRANSACTIONHISTORY, payload)
+    }
+    suspend fun getTransfer(payload: JSONObject): JSONObject {
         return requestPost(TRANSACTIONHISTORY, payload)
     }
 
