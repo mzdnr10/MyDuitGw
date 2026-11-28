@@ -24,12 +24,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myduitgw.R
-import com.example.myduitgw.ui.theme.Blue50
-import com.example.myduitgw.ui.theme.Grey300
-import com.example.myduitgw.ui.theme.Grey600
-import com.example.myduitgw.ui.theme.Grey900
-import com.example.myduitgw.ui.theme.Theme
-import com.example.myduitgw.ui.theme.white
+import com.example.myduitgw.core.theme.Blue50
+import com.example.myduitgw.core.theme.Grey300
+import com.example.myduitgw.core.theme.Grey600
+import com.example.myduitgw.core.theme.Grey900
+import com.example.myduitgw.core.theme.Theme
+import com.example.myduitgw.core.theme.white
 
 @Composable
 fun WelcomeScreen(

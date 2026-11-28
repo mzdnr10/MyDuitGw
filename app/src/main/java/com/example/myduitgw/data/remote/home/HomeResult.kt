@@ -1,4 +1,4 @@
-package com.example.myduitgw.data.model
+package com.example.myduitgw.model.remotestorage.home
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Build

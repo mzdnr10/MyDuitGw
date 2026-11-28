@@ -2,14 +2,14 @@ package com.example.myduitgw.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myduitgw.data.repository.AuthRepository
+import com.example.myduitgw.model.remotestorage.auth.AuthRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 import android.content.Context
-import com.example.myduitgw.data.repository.SessionManager
+import com.example.myduitgw.data.local.SessionManager
 
 data class GoogleAuthUiState(
     val isLoading: Boolean = false,

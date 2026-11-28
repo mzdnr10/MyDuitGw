@@ -1,6 +1,6 @@
 package com.example.myduitgw.data.repository
 
-import com.example.myduitgw.data.api.HomeApi
+import com.example.myduitgw.data.remote.home.HomeApi
 import org.json.JSONObject
 
 class HomeRepository(

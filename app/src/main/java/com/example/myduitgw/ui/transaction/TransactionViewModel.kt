@@ -6,20 +6,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myduitgw.data.api.TransactionApi
 import com.example.myduitgw.data.repository.TransactionRepository
-import com.example.myduitgw.data.repository.SessionManager
+import com.example.myduitgw.data.local.SessionManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-data class TransferUiState(
+data class TransactionUiState(
     val categoryAccount: JSONObject? = null,
     val isLoading: Boolean = false,
     val message: String? = null,
     val isError: Boolean = false,
 )
 
-class TransferViewModel(
+class TransactionViewModel(
     context: Context
 ) : ViewModel() {
 
@@ -32,7 +32,7 @@ class TransferViewModel(
     private val transactionRepository =
         TransactionRepository(transactionApi)
 
-    private val _uiState = MutableStateFlow(TransferUiState())
+    private val _uiState = MutableStateFlow(TransactionUiState())
 
     val uiState = _uiState.asStateFlow()
 
@@ -73,7 +73,7 @@ class TransferViewModel(
         }
     }
 
-    fun createTransfer(payload: JSONObject) {
+    fun createTransaction(payload: JSONObject) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 isLoading = true,
@@ -83,7 +83,7 @@ class TransferViewModel(
 
             try {
                 val response =
-                    transactionRepository.createTransfer(payload)
+                    transactionRepository.createTransaction(payload)
 
                 _uiState.value = _uiState.value.copy(
                     message = response.optString(

@@ -4,9 +4,9 @@ package com.example.myduitgw.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myduitgw.data.api.HomeApi
+import com.example.myduitgw.model.remotestorage.home.HomeApi
 import com.example.myduitgw.data.repository.HomeRepository
-import com.example.myduitgw.data.repository.SessionManager
+import com.example.myduitgw.data.local.SessionManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

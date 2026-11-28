@@ -30,9 +30,9 @@ import com.example.myduitgw.R
 import kotlinx.coroutines.delay
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
-import com.example.myduitgw.ui.theme.Grey600
-import com.example.myduitgw.ui.theme.Theme
-import com.example.myduitgw.ui.theme.white
+import com.example.myduitgw.core.theme.Grey600
+import com.example.myduitgw.core.theme.Theme
+import com.example.myduitgw.core.theme.white
 
 @Composable
 fun SplashScreen(

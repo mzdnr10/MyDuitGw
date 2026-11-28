@@ -1,52 +1,48 @@
-
-package com.example.myduitgw.data.local
+package com.example.myduitgw.data.repository
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 
-private val Context.dataStore by preferencesDataStore(
-    name = "user_session"
-)
+private val Context.dataStore by preferencesDataStore(name = "user_session")
 
-class SessionManager(context: Context) {
-
-    private val dataStore = context.applicationContext.dataStore
+class SessionManager(private val context: Context) {
 
     companion object {
-        private val TOKEN = stringPreferencesKey("sanctum_token")
-        private val USER_ID = stringPreferencesKey("user_id")
-        private val USER_NAME = stringPreferencesKey("user_name")
-        private val USER_EMAIL = stringPreferencesKey("user_email")
-    }
-
-    val token: Flow<String?> = dataStore.data.map {
-        it[TOKEN]
+        private val TOKEN = stringPreferencesKey("token")
+        private val USER_ID = intPreferencesKey("user_id")
+        private val NAME = stringPreferencesKey("name")
+        private val EMAIL = stringPreferencesKey("email")
     }
 
     suspend fun saveSession(
         token: String,
-        userId: String,
+        userId: Int,
         name: String,
         email: String
     ) {
-        dataStore.edit {
-            it[TOKEN] = token
-            it[USER_ID] = userId
-            it[USER_NAME] = name
-            it[USER_EMAIL] = email
+        context.dataStore.edit { preferences ->
+            preferences[TOKEN] = token
+            preferences[USER_ID] = userId
+            preferences[NAME] = name
+            preferences[EMAIL] = email
         }
     }
 
+    suspend fun getToken(): String? =
+        context.dataStore.data.first()[TOKEN]
+
+    suspend fun getName(): String? =
+        context.dataStore.data.first()[NAME]
+
     suspend fun clearSession() {
-        dataStore.edit {
-            it.remove(TOKEN)
-            it.remove(USER_ID)
-            it.remove(USER_NAME)
-            it.remove(USER_EMAIL)
-        }
+        context.dataStore.edit { it.clear() }
+    }
+
+    suspend fun hasSession(): Boolean {
+        return !getToken().isNullOrBlank()
     }
 }

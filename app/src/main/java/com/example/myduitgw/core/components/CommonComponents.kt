@@ -29,13 +29,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myduitgw.data.model.Transaction
+import com.example.myduitgw.model.remotestorage.home.Transaction
 import com.example.myduitgw.ui.theme.FinanceColors
 import com.example.myduitgw.ui.theme.Radius
 import com.example.myduitgw.ui.theme.Spacing
 import com.example.myduitgw.util.toDisplayDate
 import com.example.myduitgw.util.toSignedRupiah
-import com.example.myduitgw.data.model.Category
+import com.example.myduitgw.model.remotestorage.home.Category
 import com.example.myduitgw.ui.theme.Grey50
 import com.example.myduitgw.ui.theme.Theme
 import com.example.myduitgw.ui.theme.black
