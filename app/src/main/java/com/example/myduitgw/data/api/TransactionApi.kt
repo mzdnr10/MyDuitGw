@@ -1,6 +1,7 @@
 
 package com.example.myduitgw.data.api
 
+import android.util.Log
 import com.example.myduitgw.data.repository.SessionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -40,8 +41,8 @@ class TransactionApi(
     suspend fun getTransactionHistory(payload: JSONObject): JSONObject {
         return requestPost(TRANSACTIONHISTORY, payload)
     }
-    suspend fun getTransfer(payload: JSONObject): JSONObject {
-        return requestPost(TRANSACTIONHISTORY, payload)
+    suspend fun createTransfer(payload: JSONObject): JSONObject {
+        return requestPost(TRANSFER, payload)
     }
 
     private suspend fun requestPost(
@@ -91,6 +92,8 @@ class TransactionApi(
             if (status !in 200..299) {
                 throw Exception("HTTP Error: $status - $responseText")
             }
+
+            Log.d("Response API:", responseText)
 
             JSONObject(responseText)
 

@@ -392,7 +392,7 @@ fun TransferScreen(
                     )
                 }
 
-                Log.d("pppp", payload.toString())
+                onBack()
                 viewModel.createTransfer(payload)
             },
             enabled = isFormValid,

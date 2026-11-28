@@ -19,6 +19,6 @@ class TransactionRepository(
     }
 
     suspend fun createTransfer(payload: JSONObject): JSONObject {
-        return transactionApi.getTransfer(payload)
+        return transactionApi.createTransfer(payload)
     }
 }

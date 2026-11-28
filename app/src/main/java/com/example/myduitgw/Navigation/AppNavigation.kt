@@ -119,6 +119,7 @@ fun AppNavigation() {
     val homeUiState by homeViewModel.uiState.collectAsState()
     val transactionUiState by transactionViewModel.uiState.collectAsState()
     val transactionHistoryUiState by transactionHistoryViewModel.uiState.collectAsState()
+    val transferUiState by transferViewModel.uiState.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -394,7 +395,7 @@ fun AppNavigation() {
         }
     }
 
-    if (homeUiState.isLoading || transactionUiState.isLoading || transactionHistoryUiState.isLoading) {
+    if (homeUiState.isLoading || transactionUiState.isLoading || transactionHistoryUiState.isLoading || transferUiState.isLoading) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
