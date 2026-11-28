@@ -1,4 +1,4 @@
-package com.example.myduitgw.ui.screens
+package com.example.myduitgw.ui.auth
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween

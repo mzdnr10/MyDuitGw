@@ -1,11 +1,11 @@
-package com.example.myduitgw.viewmodel
+package com.example.myduitgw.ui.transaction
 
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myduitgw.data.api.TransactionApi
-import com.example.myduitgw.data.repository.TransactionRepository
+import com.example.myduitgw.data.remote.transaction.TransactionApi
+import com.example.myduitgw.data.remote.repository.TransactionRepository
 import com.example.myduitgw.data.local.SessionManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow

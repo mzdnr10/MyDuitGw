@@ -1,15 +1,15 @@
-package com.example.myduitgw.viewmodel
 
+package com.example.myduitgw.ui.auth
+
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myduitgw.model.remotestorage.auth.AuthRepository
+import com.example.myduitgw.data.local.SessionManager
+import com.example.myduitgw.data.repository.AuthRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
-import android.content.Context
-import com.example.myduitgw.data.local.SessionManager
 
 data class GoogleAuthUiState(
     val isLoading: Boolean = false,
@@ -23,18 +23,18 @@ class GoogleAuthViewModel(
     context: Context,
     private val authRepository: AuthRepository = AuthRepository()
 ) : ViewModel() {
+
     private val sessionManager = SessionManager(context.applicationContext)
+
     private val _uiState = MutableStateFlow(GoogleAuthUiState())
     val uiState = _uiState.asStateFlow()
-
 
     fun checkSession() {
         viewModelScope.launch {
             try {
                 val token = sessionManager.getToken()
 
-
-                if (token == null) {
+                if (token.isNullOrBlank()) {
                     sessionManager.clearSession()
 
                     _uiState.value = _uiState.value.copy(
@@ -45,8 +45,6 @@ class GoogleAuthViewModel(
                 }
 
                 val isValid = authRepository.checkSession(token)
-
-
 
                 if (!isValid) {
                     sessionManager.clearSession()
@@ -61,11 +59,12 @@ class GoogleAuthViewModel(
                 throw exception
 
             } catch (exception: Exception) {
-                sessionManager.clearSession()
-
+                // Jangan hapus session jika hanya terjadi masalah jaringan/server.
                 _uiState.value = _uiState.value.copy(
                     isAuthenticated = false,
-                    isCheckingSession = false
+                    isCheckingSession = false,
+                    message = "Gagal memeriksa session. Periksa koneksi internet.",
+                    isError = true
                 )
             }
         }
@@ -74,8 +73,10 @@ class GoogleAuthViewModel(
     fun loginWithGoogle(idToken: String) {
         viewModelScope.launch {
             _uiState.value = GoogleAuthUiState(isLoading = true)
+
             try {
                 val result = authRepository.loginWithGoogle(idToken)
+
                 sessionManager.saveSession(
                     token = result.token,
                     userId = result.userId,
@@ -87,12 +88,13 @@ class GoogleAuthViewModel(
                     message = "Login berhasil!",
                     isAuthenticated = true
                 )
-                
+
             } catch (exception: CancellationException) {
                 throw exception
+
             } catch (exception: Exception) {
                 _uiState.value = GoogleAuthUiState(
-                    message = "${exception.javaClass.name}: ${exception.message}",
+                    message = exception.message ?: "Login gagal.",
                     isError = true
                 )
             }
@@ -100,7 +102,10 @@ class GoogleAuthViewModel(
     }
 
     fun clearMessage() {
-        _uiState.value = _uiState.value.copy(message = null, isError = false)
+        _uiState.value = _uiState.value.copy(
+            message = null,
+            isError = false
+        )
     }
 
     fun onLogout() {

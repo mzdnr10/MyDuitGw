@@ -1,4 +1,4 @@
-package com.example.myduitgw.data.repository
+package com.example.myduitgw.data.remote.repository
 
 import com.example.myduitgw.data.remote.home.HomeApi
 import org.json.JSONObject

@@ -1,4 +1,4 @@
-package com.example.myduitgw.data.repository
+package com.example.myduitgw.data.local
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
@@ -35,8 +35,14 @@ class SessionManager(private val context: Context) {
     suspend fun getToken(): String? =
         context.dataStore.data.first()[TOKEN]
 
+    suspend fun getUserId(): Int? =
+        context.dataStore.data.first()[USER_ID]
+
     suspend fun getName(): String? =
         context.dataStore.data.first()[NAME]
+
+    suspend fun getEmail(): String? =
+        context.dataStore.data.first()[EMAIL]
 
     suspend fun clearSession() {
         context.dataStore.edit { it.clear() }

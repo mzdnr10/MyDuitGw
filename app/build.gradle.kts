@@ -65,4 +65,12 @@ dependencies {
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     implementation("com.valentinilk.shimmer:compose-shimmer:1.3.3")
+
+// Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
+// Gson
+    implementation("com.google.code.gson:gson:2.11.0")
+
 }

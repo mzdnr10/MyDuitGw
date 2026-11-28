@@ -1,6 +1,5 @@
 package com.example.myduitgw.ui.transaction
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,12 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.Payments
-import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,15 +16,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myduitgw.data.model.Transaction
-import com.example.myduitgw.ui.components.TransactionItem
-import com.example.myduitgw.ui.theme.FinanceColors
-import com.example.myduitgw.ui.theme.Grey50
-import com.example.myduitgw.ui.theme.Theme
-import com.example.myduitgw.util.toDisplayDate
-import com.example.myduitgw.util.toSignedRupiah
-import com.example.myduitgw.viewmodel.TransactionHistoryViewModel
-import com.example.myduitgw.viewmodel.TransactionViewModel
+import com.example.myduitgw.data.remote.home.Transaction
+import com.example.myduitgw.core.components.TransactionItem
+import com.example.myduitgw.core.theme.FinanceColors
+import com.example.myduitgw.core.theme.Grey50
+import com.example.myduitgw.core.theme.Theme
 import java.time.LocalDate
 
 

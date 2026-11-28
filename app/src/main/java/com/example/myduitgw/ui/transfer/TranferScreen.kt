@@ -1,4 +1,4 @@
-package com.example.myduitgw.ui.transaction
+package com.example.myduitgw.ui.transfer
 
 
 import androidx.compose.foundation.background
@@ -35,7 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myduitgw.core.theme.Grey50
 import com.example.myduitgw.core.theme.Theme
-import com.example.myduitgw.viewmodel.TransferViewModel
+import com.example.myduitgw.ui.transaction.DropdownField
+import com.example.myduitgw.ui.transaction.FieldLabel
 import org.json.JSONObject
 import java.text.NumberFormat
 import java.text.SimpleDateFormat

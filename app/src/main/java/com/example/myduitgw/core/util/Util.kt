@@ -1,4 +1,4 @@
-package com.example.myduitgw.util
+package com.example.myduitgw.core.util
 
 import com.example.myduitgw.ui.transaction.TransactionType
 import java.text.NumberFormat

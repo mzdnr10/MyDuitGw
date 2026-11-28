@@ -1,11 +1,10 @@
-
-package com.example.myduitgw.viewmodel
+package com.example.myduitgw.ui.home
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myduitgw.model.remotestorage.home.HomeApi
-import com.example.myduitgw.data.repository.HomeRepository
+import com.example.myduitgw.data.remote.home.HomeApi
+import com.example.myduitgw.data.remote.repository.HomeRepository
 import com.example.myduitgw.data.local.SessionManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async

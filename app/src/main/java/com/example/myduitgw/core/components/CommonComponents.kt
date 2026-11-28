@@ -1,4 +1,4 @@
-package com.example.myduitgw.ui.components
+package com.example.myduitgw.core.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -29,17 +29,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myduitgw.model.remotestorage.home.Transaction
-import com.example.myduitgw.ui.theme.FinanceColors
-import com.example.myduitgw.ui.theme.Radius
-import com.example.myduitgw.ui.theme.Spacing
-import com.example.myduitgw.util.toDisplayDate
-import com.example.myduitgw.util.toSignedRupiah
-import com.example.myduitgw.model.remotestorage.home.Category
-import com.example.myduitgw.ui.theme.Grey50
-import com.example.myduitgw.ui.theme.Theme
-import com.example.myduitgw.ui.theme.black
-import com.example.myduitgw.ui.theme.white
+import com.example.myduitgw.data.remote.home.Transaction
+import com.example.myduitgw.core.theme.FinanceColors
+import com.example.myduitgw.core.theme.Radius
+import com.example.myduitgw.core.theme.Spacing
+import com.example.myduitgw.core.util.toDisplayDate
+import com.example.myduitgw.core.util.toSignedRupiah
+import com.example.myduitgw.data.remote.home.Category
+import com.example.myduitgw.core.theme.Grey50
+import com.example.myduitgw.core.theme.Theme
+import com.example.myduitgw.core.theme.black
+import com.example.myduitgw.core.theme.white
 import com.example.myduitgw.ui.transaction.TransactionType
 
 @Composable

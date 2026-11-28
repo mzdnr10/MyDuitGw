@@ -1,4 +1,4 @@
-package com.example.myduitgw.ui.screens
+package com.example.myduitgw.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,7 +34,7 @@ import com.example.myduitgw.navigation.Routes
 import com.example.myduitgw.core.components.ProfileAvatar
 import com.example.myduitgw.core.components.TransactionItem
 import com.example.myduitgw.core.theme.Spacing
-import com.example.myduitgw.util.toRupiah
+import com.example.myduitgw.core.util.toRupiah
 import java.time.LocalDate
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.background
@@ -52,8 +52,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.myduitgw.viewmodel.HomeViewModel
-import com.example.myduitgw.model.remotestorage.home.Transaction
+import com.example.myduitgw.data.remote.home.Transaction
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -67,7 +66,7 @@ import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.ui.text.style.TextOverflow
-import com.example.myduitgw.model.remotestorage.home.DailyExpense
+import com.example.myduitgw.data.remote.home.DailyExpense
 import com.example.myduitgw.core.theme.Grey200
 import com.example.myduitgw.core.theme.Grey50
 import com.example.myduitgw.core.theme.Theme

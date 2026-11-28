@@ -1,5 +1,5 @@
 package com.example.myduitgw.navigation
-import com.example.myduitgw.ui.components.AppBottomBar
+import com.example.myduitgw.core.components.AppBottomBar
 import android.app.Activity
 import android.content.ContextWrapper
 import android.util.Log
@@ -20,11 +20,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.myduitgw.auth.GoogleAuthManager
-import com.example.myduitgw.ui.screens.WelcomeScreen
-import com.example.myduitgw.ui.screens.HomeScreen
-import com.example.myduitgw.ui.screens.SplashScreen
-import com.example.myduitgw.viewmodel.GoogleAuthViewModel
+import com.example.myduitgw.data.remote.auth.GoogleAuthManager
+import com.example.myduitgw.ui.auth.WelcomeScreen
+import com.example.myduitgw.ui.home.HomeScreen
+import com.example.myduitgw.ui.auth.SplashScreen
+import com.example.myduitgw.ui.auth.GoogleAuthViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -39,7 +39,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
-import com.example.myduitgw.viewmodel.HomeViewModel
+import com.example.myduitgw.ui.home.HomeViewModel
 import androidx.compose.material3.Surface
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -49,15 +49,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.Modifier
-import com.example.myduitgw.ui.theme.Theme
+import com.example.myduitgw.core.theme.Theme
 import com.example.myduitgw.ui.transaction.TransactionFormScreen
 import com.example.myduitgw.ui.transaction.TransactionHistoryScreen
 import com.example.myduitgw.ui.transaction.TransactionType
-import com.example.myduitgw.ui.transaction.TransferScreen
-import com.example.myduitgw.viewmodel.TransactionHistoryUiState
-import com.example.myduitgw.viewmodel.TransactionHistoryViewModel
-import com.example.myduitgw.viewmodel.TransactionViewModel
-import com.example.myduitgw.viewmodel.TransferViewModel
+import com.example.myduitgw.ui.transfer.TransferScreen
+import com.example.myduitgw.ui.transaction.TransactionHistoryViewModel
+import com.example.myduitgw.ui.transaction.TransactionViewModel
+import com.example.myduitgw.ui.transfer.TransferViewModel
 
 @Composable
 fun AppNavigation() {

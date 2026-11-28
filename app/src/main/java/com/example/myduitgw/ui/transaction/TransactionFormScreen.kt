@@ -35,9 +35,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myduitgw.ui.theme.Grey50
-import com.example.myduitgw.ui.theme.Theme
-import com.example.myduitgw.viewmodel.TransactionViewModel
+import com.example.myduitgw.core.theme.Grey50
+import com.example.myduitgw.core.theme.Theme
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.NumberFormat

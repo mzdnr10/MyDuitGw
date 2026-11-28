@@ -1,6 +1,6 @@
-package com.example.myduitgw.data.repository
+package com.example.myduitgw.data.remote.repository
 
-import com.example.myduitgw.data.api.TransactionApi
+import com.example.myduitgw.data.remote.transaction.TransactionApi
 import org.json.JSONObject
 
 class TransactionRepository(

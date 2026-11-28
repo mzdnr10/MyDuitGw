@@ -1,4 +1,4 @@
-package com.example.myduitgw.ui.theme
+package com.example.myduitgw.core.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

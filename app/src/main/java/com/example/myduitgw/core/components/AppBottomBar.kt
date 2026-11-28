@@ -1,4 +1,4 @@
-package com.example.myduitgw.ui.components
+package com.example.myduitgw.core.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -32,7 +32,7 @@ import androidx.compose.material.icons.rounded.ArrowDownward
 import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material.icons.rounded.Close
-import com.example.myduitgw.ui.theme.Theme
+import com.example.myduitgw.core.theme.Theme
 
 
 @Composable
